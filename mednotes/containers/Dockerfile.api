@@ -1,0 +1,25 @@
+FROM --platform=linux/amd64 ubuntu:24.04
+COPY --from=ghcr.io/astral-sh/uv:0.6.2 /uv /uvx /bin/
+
+ENV PYTHONUNBUFFER=1
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y build-essential libpq-dev python3-dev && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i -e 's/^UMASK.*/UMASK 027/g' /etc/login.defs
+RUN sed -i -e 's/^USERGROUPS_ENAB.*/USERGROUPS_ENAB no/g' /etc/login.defs
+
+
+WORKDIR /mednotes
+COPY pyproject.toml uv.lock .
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-workspace
+
+COPY backend/mednotes/ ./mednotes
+ARG BUILD_VERSION=0.0.0-0
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $BUILD_VERSION && \
+    uv sync --frozen

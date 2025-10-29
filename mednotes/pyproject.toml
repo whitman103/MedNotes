@@ -4,4 +4,20 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.120.1",
+    "matplotlib>=3.10.7",
+    "pgvector>=0.4.1",
+    "psycopg>=3.2.12",
+    "pydantic>=2.12.3",
+    "pyqt5>=5.15.11",
+    "pyyaml>=6.0.3",
+    "sentence-transformers>=5.1.2",
+    "sqlalchemy>=2.0.44",
+    "uvicorn>=0.38.0",
+]
+
+
+[tool.setuptools.packages.find]
+where=['backend/']
+include = ["*"]

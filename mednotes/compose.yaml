@@ -1,0 +1,4 @@
+name: mednotes
+include:
+  - path: compose/api.yaml
+    project_directory: .
