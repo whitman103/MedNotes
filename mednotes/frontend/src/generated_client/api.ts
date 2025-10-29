@@ -23,6 +23,89 @@ import type { RequestArgs } from './base';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
+/**
+ * 
+ * @export
+ * @interface EmbeddedSentenceGet
+ */
+export interface EmbeddedSentenceGet {
+    /**
+     * 
+     * @type {string}
+     * @memberof EmbeddedSentenceGet
+     */
+    'text': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmbeddedSentenceGet
+     */
+    'topic'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface EmbeddedSentencePost
+ */
+export interface EmbeddedSentencePost {
+    /**
+     * 
+     * @type {string}
+     * @memberof EmbeddedSentencePost
+     */
+    'text': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmbeddedSentencePost
+     */
+    'topic'?: string | null;
+}
+/**
+ * 
+ * @export
+ * @interface HTTPValidationError
+ */
+export interface HTTPValidationError {
+    /**
+     * 
+     * @type {Array<ValidationError>}
+     * @memberof HTTPValidationError
+     */
+    'detail'?: Array<ValidationError>;
+}
+/**
+ * 
+ * @export
+ * @interface LocationInner
+ */
+export interface LocationInner {
+}
+/**
+ * 
+ * @export
+ * @interface ValidationError
+ */
+export interface ValidationError {
+    /**
+     * 
+     * @type {Array<LocationInner>}
+     * @memberof ValidationError
+     */
+    'loc': Array<LocationInner>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationError
+     */
+    'msg': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ValidationError
+     */
+    'type': string;
+}
 
 /**
  * MlApi - axios parameter creator
@@ -32,12 +115,52 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Baseline Get
+         * @summary Embed Sentence
+         * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        baselineGetMlGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/ml`;
+        embedSentenceMlEmbedPost: async (embeddedSentencePost: EmbeddedSentencePost, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'embeddedSentencePost' is not null or undefined
+            assertParamExists('embedSentenceMlEmbedPost', 'embeddedSentencePost', embeddedSentencePost)
+            const localVarPath = `/ml/embed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(embeddedSentencePost, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Search For Value
+         * @param {string} searchSentence 
+         * @param {string | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchForValueMlSearchGet: async (searchSentence: string, topic?: string | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'searchSentence' is not null or undefined
+            assertParamExists('searchForValueMlSearchGet', 'searchSentence', searchSentence)
+            const localVarPath = `/ml/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -48,6 +171,14 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (searchSentence !== undefined) {
+                localVarQueryParameter['search_sentence'] = searchSentence;
+            }
+
+            if (topic !== undefined) {
+                localVarQueryParameter['topic'] = topic;
+            }
 
 
     
@@ -72,12 +203,25 @@ export const MlApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Baseline Get
+         * @summary Embed Sentence
+         * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async baselineGetMlGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.baselineGetMlGet(options);
+        async embedSentenceMlEmbedPost(embeddedSentencePost: EmbeddedSentencePost, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EmbeddedSentenceGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.embedSentenceMlEmbedPost(embeddedSentencePost, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Search For Value
+         * @param {string} searchSentence 
+         * @param {string | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<EmbeddedSentenceGet>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForValueMlSearchGet(searchSentence, topic, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -92,12 +236,24 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
     return {
         /**
          * 
-         * @summary Baseline Get
+         * @summary Embed Sentence
+         * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        baselineGetMlGet(options?: any): AxiosPromise<any> {
-            return localVarFp.baselineGetMlGet(options).then((request) => request(axios, basePath));
+        embedSentenceMlEmbedPost(embeddedSentencePost: EmbeddedSentencePost, options?: any): AxiosPromise<EmbeddedSentenceGet> {
+            return localVarFp.embedSentenceMlEmbedPost(embeddedSentencePost, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Search For Value
+         * @param {string} searchSentence 
+         * @param {string | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: any): AxiosPromise<Array<EmbeddedSentenceGet>> {
+            return localVarFp.searchForValueMlSearchGet(searchSentence, topic, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -111,13 +267,27 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
 export class MlApi extends BaseAPI {
     /**
      * 
-     * @summary Baseline Get
+     * @summary Embed Sentence
+     * @param {EmbeddedSentencePost} embeddedSentencePost 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MlApi
      */
-    public baselineGetMlGet(options?: AxiosRequestConfig) {
-        return MlApiFp(this.configuration).baselineGetMlGet(options).then((request) => request(this.axios, this.basePath));
+    public embedSentenceMlEmbedPost(embeddedSentencePost: EmbeddedSentencePost, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).embedSentenceMlEmbedPost(embeddedSentencePost, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Search For Value
+     * @param {string} searchSentence 
+     * @param {string | null} [topic] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).searchForValueMlSearchGet(searchSentence, topic, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
