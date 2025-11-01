@@ -37,10 +37,10 @@ export interface EmbeddedSentenceGet {
     'text': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<Topic>}
      * @memberof EmbeddedSentenceGet
      */
-    'topic'?: string | null;
+    'topic'?: Array<Topic> | null;
 }
 /**
  * 
@@ -56,10 +56,10 @@ export interface EmbeddedSentencePost {
     'text': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<Topic>}
      * @memberof EmbeddedSentencePost
      */
-    'topic'?: string | null;
+    'topic'?: Array<Topic> | null;
 }
 /**
  * 
@@ -81,6 +81,49 @@ export interface HTTPValidationError {
  */
 export interface LocationInner {
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Topic = {
+    General: 'general',
+    Anatomy: 'anatomy',
+    Biochemistry: 'biochemistry',
+    Genetics: 'genetics',
+    Immunology: 'immunology',
+    Microbiology: 'microbiology',
+    Pathology: 'pathology',
+    Anesthesiology: 'anesthesiology',
+    Dermatology: 'dermatology',
+    Emergency: 'emergency',
+    Hospice: 'hospice',
+    Cardiovascular: 'cardiovascular',
+    Gastroenterology: 'gastroenterology',
+    Hematology: 'hematology',
+    Oncology: 'oncology',
+    Nephrology: 'nephrology',
+    InfectiousDisease: 'infectious disease',
+    Rheumatology: 'rheumatology',
+    Neurology: 'neurology',
+    Obsterics: 'obsterics',
+    Gynecology: 'gynecology',
+    Ophthalmology: 'ophthalmology',
+    Orthopaedics: 'orthopaedics',
+    Otolaryngology: 'otolaryngology',
+    Pediatrics: 'pediatrics',
+    Plastics: 'plastics',
+    PhysicalMedicineAndRehabilitation: 'physical medicine and rehabilitation',
+    Psychiatry: 'psychiatry',
+    Radiology: 'radiology',
+    Surgery: 'surgery',
+    Urology: 'urology'
+} as const;
+
+export type Topic = typeof Topic[keyof typeof Topic];
+
+
 /**
  * 
  * @export
@@ -113,6 +156,43 @@ export interface ValidationError {
  */
 export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Delete Note
+         * @param {number} noteId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteNoteMlNoteDelete: async (noteId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'noteId' is not null or undefined
+            assertParamExists('deleteNoteMlNoteDelete', 'noteId', noteId)
+            const localVarPath = `/ml/note`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (noteId !== undefined) {
+                localVarQueryParameter['note_id'] = noteId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Embed Sentence
@@ -203,6 +283,17 @@ export const MlApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Delete Note
+         * @param {number} noteId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteNoteMlNoteDelete(noteId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteNoteMlNoteDelete(noteId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Embed Sentence
          * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
@@ -236,6 +327,16 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
     return {
         /**
          * 
+         * @summary Delete Note
+         * @param {number} noteId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteNoteMlNoteDelete(noteId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteNoteMlNoteDelete(noteId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Embed Sentence
          * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
@@ -265,6 +366,18 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
  * @extends {BaseAPI}
  */
 export class MlApi extends BaseAPI {
+    /**
+     * 
+     * @summary Delete Note
+     * @param {number} noteId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public deleteNoteMlNoteDelete(noteId: number, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).deleteNoteMlNoteDelete(noteId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Embed Sentence
