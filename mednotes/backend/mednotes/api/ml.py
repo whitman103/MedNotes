@@ -35,7 +35,7 @@ def embed_sentence(
 @router.get("/search/note", response_model=list[EmbeddedSentenceGet], status_code=200)
 def search_for_value(
     search_sentence: str,
-    topic: Optional[str] = None,
+    topic: Optional[list[str]] = None,
     sess: Session = Depends(get_session),
 ) -> list[EmbeddedSentenceGet]:
     search = [search_sentence]

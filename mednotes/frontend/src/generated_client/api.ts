@@ -107,7 +107,7 @@ export const Topic = {
     InfectiousDisease: 'infectious disease',
     Rheumatology: 'rheumatology',
     Neurology: 'neurology',
-    Obsterics: 'obsterics',
+    Obstetrics: 'obstetrics',
     Gynecology: 'gynecology',
     Ophthalmology: 'ophthalmology',
     Orthopaedics: 'orthopaedics',
@@ -124,6 +124,13 @@ export const Topic = {
 export type Topic = typeof Topic[keyof typeof Topic];
 
 
+/**
+ * 
+ * @export
+ * @interface Topic1
+ */
+export interface Topic1 {
+}
 /**
  * 
  * @export
@@ -231,16 +238,62 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Search For Question
+         * @param {string} searchKey 
+         * @param {number} [resultRequest] 
+         * @param {string | Array<string> | null} [stringArraystring] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchForQuestionMlSearchQuestionGet: async (searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'searchKey' is not null or undefined
+            assertParamExists('searchForQuestionMlSearchQuestionGet', 'searchKey', searchKey)
+            const localVarPath = `/ml/search/question`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (searchKey !== undefined) {
+                localVarQueryParameter['search_key'] = searchKey;
+            }
+
+            if (resultRequest !== undefined) {
+                localVarQueryParameter['result_request'] = resultRequest;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(stringArraystring, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Search For Value
          * @param {string} searchSentence 
          * @param {string | null} [topic] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchForValueMlSearchGet: async (searchSentence: string, topic?: string | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchForValueMlSearchNoteGet: async (searchSentence: string, topic?: string | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'searchSentence' is not null or undefined
-            assertParamExists('searchForValueMlSearchGet', 'searchSentence', searchSentence)
-            const localVarPath = `/ml/search`;
+            assertParamExists('searchForValueMlSearchNoteGet', 'searchSentence', searchSentence)
+            const localVarPath = `/ml/search/note`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -305,14 +358,27 @@ export const MlApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Search For Question
+         * @param {string} searchKey 
+         * @param {number} [resultRequest] 
+         * @param {string | Array<string> | null} [stringArraystring] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForQuestionMlSearchQuestionGet(searchKey, resultRequest, stringArraystring, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Search For Value
          * @param {string} searchSentence 
          * @param {string | null} [topic] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<EmbeddedSentenceGet>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForValueMlSearchGet(searchSentence, topic, options);
+        async searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<EmbeddedSentenceGet>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForValueMlSearchNoteGet(searchSentence, topic, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -347,14 +413,26 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
+         * @summary Search For Question
+         * @param {string} searchKey 
+         * @param {number} [resultRequest] 
+         * @param {string | Array<string> | null} [stringArraystring] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: any): AxiosPromise<any> {
+            return localVarFp.searchForQuestionMlSearchQuestionGet(searchKey, resultRequest, stringArraystring, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Search For Value
          * @param {string} searchSentence 
          * @param {string | null} [topic] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: any): AxiosPromise<Array<EmbeddedSentenceGet>> {
-            return localVarFp.searchForValueMlSearchGet(searchSentence, topic, options).then((request) => request(axios, basePath));
+        searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: any): AxiosPromise<Array<EmbeddedSentenceGet>> {
+            return localVarFp.searchForValueMlSearchNoteGet(searchSentence, topic, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -392,6 +470,20 @@ export class MlApi extends BaseAPI {
 
     /**
      * 
+     * @summary Search For Question
+     * @param {string} searchKey 
+     * @param {number} [resultRequest] 
+     * @param {string | Array<string> | null} [stringArraystring] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).searchForQuestionMlSearchQuestionGet(searchKey, resultRequest, stringArraystring, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Search For Value
      * @param {string} searchSentence 
      * @param {string | null} [topic] 
@@ -399,8 +491,8 @@ export class MlApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MlApi
      */
-    public searchForValueMlSearchGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig) {
-        return MlApiFp(this.configuration).searchForValueMlSearchGet(searchSentence, topic, options).then((request) => request(this.axios, this.basePath));
+    public searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).searchForValueMlSearchNoteGet(searchSentence, topic, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

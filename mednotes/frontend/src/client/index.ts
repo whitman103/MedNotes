@@ -22,4 +22,5 @@ export const setBasePath = (basePath: string) => {
 export const hasBasePath = () => !!config.basePath;
 
 const mlApi = MlApiFactory(config);
-export const getBaseline = usingPromises(mlApi.baselineGetMlGet);
+export const createNote = usingPromises(mlApi.embedSentenceMlEmbedPost);
+export const retrieveNotes = usingPromises(mlApi.searchForValueMlSearchNoteGet);

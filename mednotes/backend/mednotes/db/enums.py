@@ -21,7 +21,7 @@ class Topic(str, Enum):
     INFECTIOUS_DISEASE = "infectious disease"
     RHEUMATOLOGY = "rheumatology"
     NEUROLOGY = "neurology"
-    OBSTERICS = "obsterics"
+    OBSTETRICS = "obstetrics"
     GYNECOLOGY = "gynecology"
     OPHTHALMOLOGY = "ophthalmology"
     ORTHOPAEDICS = "orthopaedics"
