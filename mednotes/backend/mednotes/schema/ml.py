@@ -19,3 +19,15 @@ class TopicGet(BaseModel):
 
     topic_name: str
     n_notes: int
+
+
+class QuestionPost(BaseModel):
+    text: str
+    answer: str
+    topic: Optional[list[Topic]] = None
+
+
+class QuestionGet(BaseModel):
+    text: str
+    answer: str
+    topic: Optional[list[Topic]] = None

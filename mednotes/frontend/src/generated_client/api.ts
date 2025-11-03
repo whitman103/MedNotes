@@ -84,6 +84,31 @@ export interface LocationInner {
 /**
  * 
  * @export
+ * @interface QuestionPost
+ */
+export interface QuestionPost {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionPost
+     */
+    'answer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionPost
+     */
+    'text': string;
+    /**
+     * 
+     * @type {Array<Topic>}
+     * @memberof QuestionPost
+     */
+    'topic'?: Array<Topic> | null;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -165,6 +190,42 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Create Question
+         * @param {QuestionPost} questionPost 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createQuestionMlQuestionPost: async (questionPost: QuestionPost, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'questionPost' is not null or undefined
+            assertParamExists('createQuestionMlQuestionPost', 'questionPost', questionPost)
+            const localVarPath = `/ml/question`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(questionPost, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Delete Note
          * @param {number} noteId 
          * @param {*} [options] Override http request option.
@@ -187,6 +248,43 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
 
             if (noteId !== undefined) {
                 localVarQueryParameter['note_id'] = noteId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Question
+         * @param {number} questionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteQuestionMlQuestionDelete: async (questionId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'questionId' is not null or undefined
+            assertParamExists('deleteQuestionMlQuestionDelete', 'questionId', questionId)
+            const localVarPath = `/ml/question`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (questionId !== undefined) {
+                localVarQueryParameter['question_id'] = questionId;
             }
 
 
@@ -286,11 +384,12 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
          * 
          * @summary Search For Value
          * @param {string} searchSentence 
-         * @param {string | null} [topic] 
+         * @param {number} [resultRequest] 
+         * @param {Array<string> | null} [requestBody] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchForValueMlSearchNoteGet: async (searchSentence: string, topic?: string | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchForValueMlSearchNoteGet: async (searchSentence: string, resultRequest?: number, requestBody?: Array<string> | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'searchSentence' is not null or undefined
             assertParamExists('searchForValueMlSearchNoteGet', 'searchSentence', searchSentence)
             const localVarPath = `/ml/search/note`;
@@ -309,15 +408,18 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
                 localVarQueryParameter['search_sentence'] = searchSentence;
             }
 
-            if (topic !== undefined) {
-                localVarQueryParameter['topic'] = topic;
+            if (resultRequest !== undefined) {
+                localVarQueryParameter['result_request'] = resultRequest;
             }
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -336,6 +438,17 @@ export const MlApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Create Question
+         * @param {QuestionPost} questionPost 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createQuestionMlQuestionPost(questionPost: QuestionPost, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuestionPost>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createQuestionMlQuestionPost(questionPost, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Delete Note
          * @param {number} noteId 
          * @param {*} [options] Override http request option.
@@ -343,6 +456,17 @@ export const MlApiFp = function(configuration?: Configuration) {
          */
         async deleteNoteMlNoteDelete(noteId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteNoteMlNoteDelete(noteId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete Question
+         * @param {number} questionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteQuestionMlQuestionDelete(questionId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteQuestionMlQuestionDelete(questionId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -373,12 +497,13 @@ export const MlApiFp = function(configuration?: Configuration) {
          * 
          * @summary Search For Value
          * @param {string} searchSentence 
-         * @param {string | null} [topic] 
+         * @param {number} [resultRequest] 
+         * @param {Array<string> | null} [requestBody] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<EmbeddedSentenceGet>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForValueMlSearchNoteGet(searchSentence, topic, options);
+        async searchForValueMlSearchNoteGet(searchSentence: string, resultRequest?: number, requestBody?: Array<string> | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<EmbeddedSentenceGet>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchForValueMlSearchNoteGet(searchSentence, resultRequest, requestBody, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -393,6 +518,16 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
     return {
         /**
          * 
+         * @summary Create Question
+         * @param {QuestionPost} questionPost 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createQuestionMlQuestionPost(questionPost: QuestionPost, options?: any): AxiosPromise<QuestionPost> {
+            return localVarFp.createQuestionMlQuestionPost(questionPost, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Delete Note
          * @param {number} noteId 
          * @param {*} [options] Override http request option.
@@ -400,6 +535,16 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
          */
         deleteNoteMlNoteDelete(noteId: number, options?: any): AxiosPromise<void> {
             return localVarFp.deleteNoteMlNoteDelete(noteId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Question
+         * @param {number} questionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteQuestionMlQuestionDelete(questionId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteQuestionMlQuestionDelete(questionId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -427,12 +572,13 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
          * 
          * @summary Search For Value
          * @param {string} searchSentence 
-         * @param {string | null} [topic] 
+         * @param {number} [resultRequest] 
+         * @param {Array<string> | null} [requestBody] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: any): AxiosPromise<Array<EmbeddedSentenceGet>> {
-            return localVarFp.searchForValueMlSearchNoteGet(searchSentence, topic, options).then((request) => request(axios, basePath));
+        searchForValueMlSearchNoteGet(searchSentence: string, resultRequest?: number, requestBody?: Array<string> | null, options?: any): AxiosPromise<Array<EmbeddedSentenceGet>> {
+            return localVarFp.searchForValueMlSearchNoteGet(searchSentence, resultRequest, requestBody, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -446,6 +592,18 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
 export class MlApi extends BaseAPI {
     /**
      * 
+     * @summary Create Question
+     * @param {QuestionPost} questionPost 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public createQuestionMlQuestionPost(questionPost: QuestionPost, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).createQuestionMlQuestionPost(questionPost, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Delete Note
      * @param {number} noteId 
      * @param {*} [options] Override http request option.
@@ -454,6 +612,18 @@ export class MlApi extends BaseAPI {
      */
     public deleteNoteMlNoteDelete(noteId: number, options?: AxiosRequestConfig) {
         return MlApiFp(this.configuration).deleteNoteMlNoteDelete(noteId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Question
+     * @param {number} questionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public deleteQuestionMlQuestionDelete(questionId: number, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).deleteQuestionMlQuestionDelete(questionId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -486,13 +656,14 @@ export class MlApi extends BaseAPI {
      * 
      * @summary Search For Value
      * @param {string} searchSentence 
-     * @param {string | null} [topic] 
+     * @param {number} [resultRequest] 
+     * @param {Array<string> | null} [requestBody] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MlApi
      */
-    public searchForValueMlSearchNoteGet(searchSentence: string, topic?: string | null, options?: AxiosRequestConfig) {
-        return MlApiFp(this.configuration).searchForValueMlSearchNoteGet(searchSentence, topic, options).then((request) => request(this.axios, this.basePath));
+    public searchForValueMlSearchNoteGet(searchSentence: string, resultRequest?: number, requestBody?: Array<string> | null, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).searchForValueMlSearchNoteGet(searchSentence, resultRequest, requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

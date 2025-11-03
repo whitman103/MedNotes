@@ -7,11 +7,22 @@ import { ThemeProvider } from './components/theme-provider'
 import DrawLogo from './components/background/background-draw'
 import { CardHeader, CardTitle, Card, CardContent } from './components/ui/card'
 import { UserCard } from './components/usercard/usercard'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MutationCache, QueryCache } from '@tanstack/react-query'
+
 
 function WrappedApp() {
-  return <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-    {<App />}
-  </ThemeProvider>
+
+
+  const queryCache = new QueryCache();
+  const mutationCache = new MutationCache();
+  const [queryClient] = useState(() => new QueryClient({ mutationCache, queryCache }))
+
+  return <QueryClientProvider client={queryClient}>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      {<App />}
+    </ThemeProvider>
+  </QueryClientProvider>
 }
 
 
@@ -32,6 +43,7 @@ function App() {
     document.body.prepend(bgDiv);
     DrawLogo();
   }
+
 
   return (
     <>

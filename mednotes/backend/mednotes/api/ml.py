@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends
 from contextlib import asynccontextmanager
 from sentence_transformers import SentenceTransformer
-from mednotes.schema.ml import EmbeddedSentenceGet, EmbeddedSentencePost
+from mednotes.schema.ml import (
+    EmbeddedSentenceGet,
+    EmbeddedSentencePost,
+    QuestionGet,
+    QuestionPost,
+)
 from mednotes.db.ml import Note, Question
 from mednotes.db.connection import get_session, reset_tables
 from typing import Optional
@@ -32,14 +37,35 @@ def embed_sentence(
     return EmbeddedSentenceGet(text=new_note.text, topic=new_note.topic)
 
 
+@router.post("/question", response_model=QuestionPost, status_code=201)
+def create_question(
+    input_question: QuestionPost, sess: Session = Depends(get_session)
+) -> QuestionGet:
+    embedding = ml_models["embedder"].encode([input_question.text])[0]
+    new_question = Question.insert(
+        sess,
+        embedding,
+        text=input_question.text,
+        answer=input_question.answer,
+        topic=input_question.topic,
+    )
+    return new_question
+
+
 @router.get("/search/note", response_model=list[EmbeddedSentenceGet], status_code=200)
 def search_for_value(
     search_sentence: str,
     topic: Optional[list[str]] = None,
+    result_request: int = 5,
     sess: Session = Depends(get_session),
 ) -> list[EmbeddedSentenceGet]:
     search = [search_sentence]
-    search_results = Note.search(sess, ml_models["embedder"].encode(search)[0])
+    search_results = Note.search(
+        sess,
+        ml_models["embedder"].encode(search)[0],
+        topic=topic,
+        result_num=result_request,
+    )
 
     return [EmbeddedSentenceGet(text=x.text, topic=x.topic) for x in search_results]
 
@@ -47,6 +73,12 @@ def search_for_value(
 @router.delete("/note", status_code=204)
 def delete_note(note_id: int, sess: Session = Depends(get_session)) -> None:
     Note.delete(sess, note_id)
+    return True
+
+
+@router.delete("/question", status_code=204)
+def delete_question(question_id: int, sess: Session = Depends(get_session)) -> None:
+    Question.delete(sess, question_id=question_id)
     return True
 
 
