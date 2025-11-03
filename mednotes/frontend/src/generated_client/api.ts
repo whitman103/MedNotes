@@ -84,6 +84,31 @@ export interface LocationInner {
 /**
  * 
  * @export
+ * @interface QuestionGet
+ */
+export interface QuestionGet {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionGet
+     */
+    'answer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionGet
+     */
+    'text': string;
+    /**
+     * 
+     * @type {Array<Topic>}
+     * @memberof QuestionGet
+     */
+    'topic'?: Array<Topic> | null;
+}
+/**
+ * 
+ * @export
  * @interface QuestionPost
  */
 export interface QuestionPost {
@@ -489,7 +514,7 @@ export const MlApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<QuestionGet>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.searchForQuestionMlSearchQuestionGet(searchKey, resultRequest, stringArraystring, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -565,7 +590,7 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: any): AxiosPromise<any> {
+        searchForQuestionMlSearchQuestionGet(searchKey: string, resultRequest?: number, stringArraystring?: string | Array<string> | null, options?: any): AxiosPromise<Array<QuestionGet>> {
             return localVarFp.searchForQuestionMlSearchQuestionGet(searchKey, resultRequest, stringArraystring, options).then((request) => request(axios, basePath));
         },
         /**

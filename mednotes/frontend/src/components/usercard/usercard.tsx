@@ -6,11 +6,10 @@ import { Item, ItemContent } from "../ui/item";
 
 export function UserCard() {
     const [selected, setSelected] = useState<string[]>([]);
-    return <div className="flex w-full flex-col gap-6 justify-center bg-muted/85">
+    return <div className="flex w-full flex-col gap-6 justify-center bg-muted/85 rounded-md border">
         <Item>
-            <ItemContent>
+            <ItemContent className="max-w-screen-full">
                 <QueryTabs selected={selected}>
-
                 </QueryTabs>
             </ItemContent>
         </Item>

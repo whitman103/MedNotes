@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, Session
 from sqlalchemy import select, Enum as SAEnum
 from typing import Optional
 from mednotes.db.enums import Topic
+import sqlalchemy.dialects.postgresql as pg
 
 
 topic_enum = SAEnum(Topic, name="topic_enum", native_enum=True)
@@ -15,7 +16,7 @@ class Note(Base):
     note_id: Mapped[IntPK]
     embedding = mapped_column(Vector(768))
     text: Mapped[str]
-    topic: Mapped[Optional[list[Topic]]] = mapped_column(topic_enum)
+    topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
 
     @classmethod
     def search(
@@ -77,7 +78,7 @@ class Question(Base):
     embedding = mapped_column(Vector(768))
     question_text: Mapped[str]
     question_answer: Mapped[str]
-    topic: Mapped[Optional[list[Topic]]] = mapped_column(topic_enum)
+    topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
 
     @classmethod
     def insert(

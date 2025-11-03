@@ -57,16 +57,6 @@ function App() {
 
 
       <UserCard />
-      <Card style={{ 'padding': '1em' }}>
-        <CardHeader>
-          <CardTitle>Here is a button!</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={() => setCount((count) => count + 1)}>
-            Count is {count}!
-          </Button>
-        </CardContent>
-      </Card>
     </>
 
 

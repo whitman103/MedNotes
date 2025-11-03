@@ -49,7 +49,11 @@ def create_question(
         answer=input_question.answer,
         topic=input_question.topic,
     )
-    return new_question
+    return QuestionGet(
+        text=input_question.text,
+        answer=input_question.answer,
+        topic=input_question.topic,
+    )
 
 
 @router.get("/search/note", response_model=list[EmbeddedSentenceGet], status_code=200)
@@ -82,17 +86,20 @@ def delete_question(question_id: int, sess: Session = Depends(get_session)) -> N
     return True
 
 
-@router.get("/search/question", status_code=200)
+@router.get("/search/question", status_code=200, response_model=list[QuestionGet])
 def search_for_question(
     search_key: str,
     topic: Optional[str | list[str]] = None,
     result_request: int = 5,
     sess: Session = Depends(get_session),
-) -> None:
+) -> list[QuestionGet]:
     if isinstance(topic, str):
         topic = [topic]
     embedding = ml_models["embedder"].encode([search_key])[0]
     returned_questions = Question.search(
         sess, to_search=embedding, topic=topic, result_num=result_request
     )
-    return returned_questions
+    return [
+        QuestionGet(text=x.question_text, answer=x.question_answer, topic=x.topic)
+        for x in returned_questions
+    ]

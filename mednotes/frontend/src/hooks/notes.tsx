@@ -15,8 +15,8 @@ export function useCreateNote() {
     })
 }
 
-export function useFetchNotes(form: UseFormReturn<queryFormDataType>, result_request: number, topics: Topic[]) {
-    return useQuery({ enabled: false, queryFn: () => retrieveNotes(form.getValues('text'), result_request, topics), queryKey: ['NOTES', form.watch()] })
+export function useFetchNotes(form: UseFormReturn<queryFormDataType>, topics: Topic[]) {
+    return useQuery({ enabled: false, queryFn: () => retrieveNotes(form.getValues('text'), form.getValues('result_limit'), topics), queryKey: ['NOTES', form.getValues('text')] })
 }
 
 export function useCreateQuestion() {
@@ -29,6 +29,6 @@ export function useCreateQuestion() {
     })
 }
 
-export function useFetchQuestions() {
-    return useQuery({ enabled: false, queryFn: (question: string, topics: Topic[], result_limit: number | undefined) => retrieveQuestions(question, result_limit, topics), queryKey: ['QUESTIONS'] });
+export function useFetchQuestions(form: UseFormReturn<queryFormDataType>, topics: Topic[]) {
+    return useQuery({ enabled: false, queryFn: () => retrieveQuestions(form.getValues('text'), form.getValues('result_limit'), topics), queryKey: ['QUESTIONS', form.getValues('text')] });
 }

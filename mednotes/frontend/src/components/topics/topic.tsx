@@ -9,7 +9,7 @@ import { MdOutlineEmergency } from "react-icons/md";
 import { Topic } from '@/generated_client';
 import { cva } from 'class-variance-authority';
 import type { IconType } from 'react-icons/lib';
-
+import { Button } from '../ui/button';
 
 
 interface IconColors {
@@ -19,7 +19,7 @@ interface IconColors {
 }
 
 
-const IconSettings: { [key: string]: IconColors } = Object.fromEntries(Object.values(Topic).map(value => [value, { 'fill': 'orange', 'stroke': 'black', icon: LuAlbum }]));
+export const IconSettings: { [key: string]: IconColors } = Object.fromEntries(Object.values(Topic).map(value => [value, { 'fill': 'orange', 'stroke': 'black', icon: LuAlbum }]));
 IconSettings['neurology'] = { 'fill': 'red', 'stroke': 'black', 'icon': LuBrain };
 IconSettings['surgery'] = { 'fill': 'blue', 'stroke': 'black', 'icon': GiScalpel };
 IconSettings['gynecology'] = { 'fill': 'pink', 'stroke': 'black', 'icon': GiRose };
@@ -34,32 +34,38 @@ IconSettings['ophthalmology'] = { 'fill': 'orange', 'stroke': 'black', 'icon': F
 IconSettings['urology'] = { 'fill': 'red', 'stroke': 'white', 'icon': GiSausage }
 
 export function TopicsCard({ selected, setSelected }: { selected: string[], setSelected: (string[]) }) {
-    return <div className="flex w-full flex-col gap-6 justify-center bg-muted/85">
+    function clearSelected() {
+        setSelected([]);
+    }
+    return <div className="flex w-full flex-col gap-6 justify-center bg-muted/85 rounded-md border">
         <Item>
             <ItemContent>
                 <ItemTitle className="text-lg">Topics</ItemTitle>
-                <AutoToggle setSelected={setSelected} />
+                <AutoToggle selected={selected} setSelected={setSelected} />
             </ItemContent>
         </Item>
-        <Item variant='default' className="">
-            <ItemTitle className="text-lg">Selected Topics</ItemTitle>
-            <ItemContent>
-                <div className="flex flex-wrap gap-2 items-center">
-                    {selected.map((item, index) => {
-                        // get icon dynamically, fallback to a placeholder if missing
-                        const Icon = IconSettings[item].icon;
+        <div className="flex justify-center items-center">
+            <Item variant='default' className="">
+                <ItemTitle className="text-lg">Selected Topics</ItemTitle>
+                <ItemContent>
+                    <div className="flex flex-wrap gap-2 items-center">
+                        {selected.map((item, index) => {
+                            // get icon dynamically, fallback to a placeholder if missing
+                            const Icon = IconSettings[item].icon;
 
-                        return (
-                            <span key={item} className="flex items-center gap-1 text-lg">
-                                {Icon && <Icon className="w-5 h-5 inline-block" fill={IconSettings[item].fill} stroke={IconSettings[item].stroke} />}
-                                {item[0].toUpperCase() + item.slice(1)}
-                                {index < selected.length - 1 ? "," : ""}
-                            </span>
-                        );
-                    })}
-                </div>
-            </ItemContent>
-        </Item>
+                            return (
+                                <span key={item} className="flex items-center gap-1 text-lg">
+                                    {Icon && <Icon className="w-5 h-5 inline-block" fill={IconSettings[item].fill} stroke={IconSettings[item].stroke} />}
+                                    {item[0].toUpperCase() + item.slice(1)}
+                                    {index < selected.length - 1 ? "," : ""}
+                                </span>
+                            );
+                        })}
+                    </div>
+                </ItemContent>
+            </Item>
+            <Button className="justify-center hover:bg-muted-foreground" onClick={clearSelected}>Reset Topics</Button>
+        </div>
     </div >
 }
 
@@ -85,8 +91,8 @@ const toggleClasses = cva(
     }
 );
 
-function AutoToggle({ setSelected }: { setSelected: ([]) => {} }) {
-    return <ToggleGroup type="multiple" variant="outline" className="flex flex-wrap max-w-[.5pw] gap-2 justify-center" spacing={2} size="sm" onValueChange={setSelected}>
+function AutoToggle({ selected, setSelected }: { selected: string[], setSelected: ([]) => {} }) {
+    return <ToggleGroup type="multiple" variant="outline" className="flex flex-wrap max-w-[.5pw] gap-2 justify-center" spacing={2} value={selected} size="sm" onValueChange={setSelected}>
         {
             Object.entries(IconSettings).map(([topic, iconSettings]) => {
                 const Icon = iconSettings.icon;
