@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import { Button } from '@/components/ui/button'
-
+import { Toaster } from 'sonner'
 import { ThemeProvider } from './components/theme-provider'
 
 import DrawLogo from './components/background/background-draw'
@@ -21,6 +21,7 @@ function WrappedApp() {
   return <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       {<App />}
+      <Toaster />
     </ThemeProvider>
   </QueryClientProvider>
 }

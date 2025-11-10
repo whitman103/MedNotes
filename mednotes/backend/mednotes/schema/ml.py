@@ -12,6 +12,7 @@ class EmbeddedSentenceGet(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     text: str
     topic: Optional[list[Topic]] = None
+    note_id: int
 
 
 class EmbeddedSentenceEdit(BaseModel):
@@ -41,6 +42,8 @@ class QuestionEdit(BaseModel):
 
 
 class QuestionGet(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     text: str
     answer: str
     topic: Optional[list[Topic]] = None
+    question_id: int

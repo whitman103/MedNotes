@@ -56,6 +56,12 @@ export interface EmbeddedSentenceEdit {
 export interface EmbeddedSentenceGet {
     /**
      * 
+     * @type {number}
+     * @memberof EmbeddedSentenceGet
+     */
+    'note_id': number;
+    /**
+     * 
      * @type {string}
      * @memberof EmbeddedSentenceGet
      */
@@ -149,6 +155,12 @@ export interface QuestionGet {
      * @memberof QuestionGet
      */
     'answer': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuestionGet
+     */
+    'question_id': number;
     /**
      * 
      * @type {string}
@@ -597,7 +609,7 @@ export const MlApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createQuestionMlQuestionPost(questionPost: QuestionPost, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuestionPost>> {
+        async createQuestionMlQuestionPost(questionPost: QuestionPost, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuestionGet>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createQuestionMlQuestionPost(questionPost, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -699,7 +711,7 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createQuestionMlQuestionPost(questionPost: QuestionPost, options?: any): AxiosPromise<QuestionPost> {
+        createQuestionMlQuestionPost(questionPost: QuestionPost, options?: any): AxiosPromise<QuestionGet> {
             return localVarFp.createQuestionMlQuestionPost(questionPost, options).then((request) => request(axios, basePath));
         },
         /**

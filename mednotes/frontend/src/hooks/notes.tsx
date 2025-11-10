@@ -1,17 +1,20 @@
+"use client"
+
 import { createNote, createQuestion, retrieveNotes, retrieveQuestions } from "@/client";
 import type { Topic } from "@/generated_client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { queryFormDataType } from "@/components/query/query";
 import type { UseFormReturn } from "react-hook-form";
+
 export function useCreateNote() {
     return useMutation({
         mutationFn:
             ({ note_text, topics }: { note_text: string, topics: Topic[] }) => {
                 return createNote({ text: note_text, topic: topics })
             },
-        onSuccess: () => { toast("Note created successfully!") },
-        onError: () => { toast("Something went wrong with note creation!") }
+        onSuccess: () => toast.success("Note created successfully!"),
+        onError: () => toast.error("Something went wrong with note creation!")
     })
 }
 
@@ -25,7 +28,7 @@ export function useCreateQuestion() {
             return createQuestion({ text: question_text, answer: answer_text, topic: topics })
         },
         onSuccess: () => toast("Question created successfully!"),
-        onError: () => { toast("Something went wrong with question creation!") }
+        onError: () => toast("Something went wrong with question creation!")
     })
 }
 

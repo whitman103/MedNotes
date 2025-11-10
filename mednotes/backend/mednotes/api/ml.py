@@ -36,7 +36,9 @@ def embed_sentence(
     new_note = Note.insert(
         sess, embedding=embedding, text=input_sentence.text, topic=input_sentence.topic
     )
-    return EmbeddedSentenceGet(text=new_note.text, topic=new_note.topic)
+    return EmbeddedSentenceGet(
+        text=new_note.text, topic=new_note.topic, note_id=new_note.note_id
+    )
 
 
 @router.put("/edit", response_model=EmbeddedSentenceGet, status_code=201)
@@ -47,7 +49,7 @@ def edit_sentence(
     return update
 
 
-@router.post("/question", response_model=QuestionPost, status_code=201)
+@router.post("/question", response_model=QuestionGet, status_code=201)
 def create_question(
     input_question: QuestionPost, sess: Session = Depends(get_session)
 ) -> QuestionGet:
@@ -60,9 +62,10 @@ def create_question(
         topic=input_question.topic,
     )
     return QuestionGet(
-        text=input_question.text,
-        answer=input_question.answer,
-        topic=input_question.topic,
+        text=new_question.question_text,
+        topic=new_question.topic,
+        question_id=new_question.question_id,
+        answer=new_question.question_answer,
     )
 
 
@@ -89,7 +92,10 @@ def search_for_value(
         result_num=result_request,
     )
 
-    return [EmbeddedSentenceGet(text=x.text, topic=x.topic) for x in search_results]
+    return [
+        EmbeddedSentenceGet(text=x.text, topic=x.topic, note_id=x.note_id)
+        for x in search_results
+    ]
 
 
 @router.delete("/note", status_code=204)
@@ -118,6 +124,11 @@ def search_for_question(
         sess, to_search=embedding, topic=topic, result_num=result_request
     )
     return [
-        QuestionGet(text=x.question_text, answer=x.question_answer, topic=x.topic)
+        QuestionGet(
+            text=x.question_text,
+            answer=x.question_answer,
+            topic=x.topic,
+            question_id=x.question_id,
+        )
         for x in returned_questions
     ]

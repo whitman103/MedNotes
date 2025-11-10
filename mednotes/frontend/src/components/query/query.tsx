@@ -138,7 +138,7 @@ function NoteCreate({ selected }: { selected: string[] }) {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel>
-                                    Question Text
+                                    Note Text
                                 </FieldLabel>
                                 <Input {...field} aria-invalid={fieldState.invalid}
                                     placeholder="Type Note Here" />
