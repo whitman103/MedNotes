@@ -177,9 +177,9 @@ class Question(Base):
 
 class QuestionStats(Base):
     __tablename__ = "QuestionStats"
-
+    stats_id: Mapped[IntPK]
     question_id: Mapped[int] = mapped_column(ForeignKey("Question.question_id"))
-    question = Mapped[Question] = relationship(back_populates="stats")
+    question: Mapped["Question"] = relationship(back_populates="stats")
     last_answered: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.now()
     )

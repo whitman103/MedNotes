@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 from mednotes.schema.ml import (
     EmbeddedSentenceGet,
     EmbeddedSentencePost,
+    EmbeddedSentenceEdit,
     QuestionGet,
     QuestionPost,
     QuestionEdit,
@@ -36,6 +37,14 @@ def embed_sentence(
         sess, embedding=embedding, text=input_sentence.text, topic=input_sentence.topic
     )
     return EmbeddedSentenceGet(text=new_note.text, topic=new_note.topic)
+
+
+@router.put("/edit", response_model=EmbeddedSentenceGet, status_code=201)
+def edit_sentence(
+    edit_sentence: EmbeddedSentenceEdit, sess: Session = Depends(get_session)
+) -> EmbeddedSentenceGet:
+    update = Note.update(sess, note_update=edit_sentence)
+    return update
 
 
 @router.post("/question", response_model=QuestionPost, status_code=201)

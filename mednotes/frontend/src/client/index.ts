@@ -28,3 +28,5 @@ export const deleteNote = usingPromises(mlApi.deleteNoteMlNoteDelete);
 export const createQuestion = usingPromises(mlApi.createQuestionMlQuestionPost);
 export const retrieveQuestions = usingPromises(mlApi.searchForQuestionMlSearchQuestionGet);
 export const deleteQuestion = usingPromises(mlApi.deleteQuestionMlQuestionDelete);
+export const editQuestion = usingPromises(mlApi.editQuestionMlQuestionPut);
+export const editNote = usingPromises(mlApi.editSentenceMlEditPut);

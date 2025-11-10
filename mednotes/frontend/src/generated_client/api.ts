@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface EmbeddedSentenceEdit
+ */
+export interface EmbeddedSentenceEdit {
+    /**
+     * 
+     * @type {number}
+     * @memberof EmbeddedSentenceEdit
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmbeddedSentenceEdit
+     */
+    'text'?: string | null;
+    /**
+     * 
+     * @type {Array<Topic>}
+     * @memberof EmbeddedSentenceEdit
+     */
+    'topic'?: Array<Topic> | null;
+}
+/**
+ * 
+ * @export
  * @interface EmbeddedSentenceGet
  */
 export interface EmbeddedSentenceGet {
@@ -80,6 +105,37 @@ export interface HTTPValidationError {
  * @interface LocationInner
  */
 export interface LocationInner {
+}
+/**
+ * 
+ * @export
+ * @interface QuestionEdit
+ */
+export interface QuestionEdit {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionEdit
+     */
+    'answer'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuestionEdit
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionEdit
+     */
+    'text'?: string | null;
+    /**
+     * 
+     * @type {Array<Topic>}
+     * @memberof QuestionEdit
+     */
+    'topic'?: Array<Topic> | null;
 }
 /**
  * 
@@ -326,6 +382,78 @@ export const MlApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Edit Question
+         * @param {QuestionEdit} questionEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        editQuestionMlQuestionPut: async (questionEdit: QuestionEdit, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'questionEdit' is not null or undefined
+            assertParamExists('editQuestionMlQuestionPut', 'questionEdit', questionEdit)
+            const localVarPath = `/ml/question`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(questionEdit, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Edit Sentence
+         * @param {EmbeddedSentenceEdit} embeddedSentenceEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        editSentenceMlEditPut: async (embeddedSentenceEdit: EmbeddedSentenceEdit, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'embeddedSentenceEdit' is not null or undefined
+            assertParamExists('editSentenceMlEditPut', 'embeddedSentenceEdit', embeddedSentenceEdit)
+            const localVarPath = `/ml/edit`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(embeddedSentenceEdit, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Embed Sentence
          * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
@@ -497,6 +625,28 @@ export const MlApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Edit Question
+         * @param {QuestionEdit} questionEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async editQuestionMlQuestionPut(questionEdit: QuestionEdit, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QuestionGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.editQuestionMlQuestionPut(questionEdit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Edit Sentence
+         * @param {EmbeddedSentenceEdit} embeddedSentenceEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async editSentenceMlEditPut(embeddedSentenceEdit: EmbeddedSentenceEdit, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EmbeddedSentenceGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.editSentenceMlEditPut(embeddedSentenceEdit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Embed Sentence
          * @param {EmbeddedSentencePost} embeddedSentencePost 
          * @param {*} [options] Override http request option.
@@ -571,6 +721,26 @@ export const MlApiFactory = function (configuration?: Configuration, basePath?: 
          */
         deleteQuestionMlQuestionDelete(questionId: number, options?: any): AxiosPromise<void> {
             return localVarFp.deleteQuestionMlQuestionDelete(questionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Edit Question
+         * @param {QuestionEdit} questionEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        editQuestionMlQuestionPut(questionEdit: QuestionEdit, options?: any): AxiosPromise<QuestionGet> {
+            return localVarFp.editQuestionMlQuestionPut(questionEdit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Edit Sentence
+         * @param {EmbeddedSentenceEdit} embeddedSentenceEdit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        editSentenceMlEditPut(embeddedSentenceEdit: EmbeddedSentenceEdit, options?: any): AxiosPromise<EmbeddedSentenceGet> {
+            return localVarFp.editSentenceMlEditPut(embeddedSentenceEdit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -650,6 +820,30 @@ export class MlApi extends BaseAPI {
      */
     public deleteQuestionMlQuestionDelete(questionId: number, options?: AxiosRequestConfig) {
         return MlApiFp(this.configuration).deleteQuestionMlQuestionDelete(questionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Edit Question
+     * @param {QuestionEdit} questionEdit 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public editQuestionMlQuestionPut(questionEdit: QuestionEdit, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).editQuestionMlQuestionPut(questionEdit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Edit Sentence
+     * @param {EmbeddedSentenceEdit} embeddedSentenceEdit 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MlApi
+     */
+    public editSentenceMlEditPut(embeddedSentenceEdit: EmbeddedSentenceEdit, options?: AxiosRequestConfig) {
+        return MlApiFp(this.configuration).editSentenceMlEditPut(embeddedSentenceEdit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
