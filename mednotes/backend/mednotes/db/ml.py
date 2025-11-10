@@ -1,11 +1,13 @@
 from mednotes.db import IntPK, Base
 from pgvector.sqlalchemy import Vector
-from sqlalchemy.orm import Mapped, mapped_column, Session
-from sqlalchemy import select, Enum as SAEnum
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
+from sqlalchemy import select, Enum as SAEnum, ForeignKey, DateTime
 from typing import Optional
 from mednotes.db.enums import Topic
 import sqlalchemy.dialects.postgresql as pg
 from mednotes.schema.ml import QuestionEdit, EmbeddedSentenceEdit
+from sqlalchemy.ext.hybrid import hybrid_property
+import datetime
 
 topic_enum = SAEnum(Topic, name="topic_enum", native_enum=True)
 
@@ -94,6 +96,7 @@ class Question(Base):
     question_text: Mapped[str]
     question_answer: Mapped[str]
     topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
+    stats: Mapped["QuestionStats"] = relationship(back_populates="question")
 
     @classmethod
     def insert(
@@ -170,3 +173,19 @@ class Question(Base):
                 .limit(result_num)
             )
         return sess.execute(query).scalars()
+
+
+class QuestionStats(Base):
+    __tablename__ = "QuestionStats"
+
+    question_id: Mapped[int] = mapped_column(ForeignKey("Question.question_id"))
+    question = Mapped[Question] = relationship(back_populates="stats")
+    last_answered: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.now()
+    )
+    correct: Mapped[int] = mapped_column(default=0)
+    total_instances: Mapped[int] = mapped_column(default=0)
+
+    @hybrid_property
+    def wrong(self) -> int:
+        return self.total_instances - self.correct
