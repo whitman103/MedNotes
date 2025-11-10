@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "mednotes"
-    ]
+    ],
+    "makefile.configureOnOpen": false
 }

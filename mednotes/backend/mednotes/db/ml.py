@@ -5,7 +5,7 @@ from sqlalchemy import select, Enum as SAEnum
 from typing import Optional
 from mednotes.db.enums import Topic
 import sqlalchemy.dialects.postgresql as pg
-
+from mednotes.schema.ml import QuestionEdit, EmbeddedSentenceEdit
 
 topic_enum = SAEnum(Topic, name="topic_enum", native_enum=True)
 
@@ -70,6 +70,21 @@ class Note(Base):
         sess.flush()
         return None
 
+    @classmethod
+    def update(cls, sess: Session, note_update: EmbeddedSentenceEdit) -> "Note":
+        to_edit = sess.execute(
+            select(Note).where(Note.note_id == note_update.id)
+        ).scalar_one_or_none()
+        if not to_edit:
+            raise ValueError("Note cannot be found in database.")
+        if note_update.text:
+            to_edit.text = note_update.text
+        if note_update.topic:
+            to_edit.text = note_update.topic
+        sess.add(to_edit)
+        sess.flush()
+        return to_edit
+
 
 class Question(Base):
     __tablename__ = "Question"
@@ -112,6 +127,24 @@ class Question(Base):
         sess.delete(to_delete)
         sess.flush()
         return None
+
+    @classmethod
+    def update(cls, sess: Session, edited_question: QuestionEdit) -> "Question":
+        to_edit = sess.execute(
+            select(Question).where(Question.question_id == edited_question.id)
+        ).scalar_one_or_none()
+        if not to_edit:
+            raise ValueError("Question cannot be found to edit!")
+
+        if edited_question.text:
+            to_edit.question_text = edited_question.text
+        if edited_question.answer:
+            to_edit.question_answer = edited_question.answer
+        if edited_question.topic:
+            to_edit.topic = edited_question.topic
+        sess.add(to_edit)
+        sess.flush()
+        return to_edit
 
     @classmethod
     def search(

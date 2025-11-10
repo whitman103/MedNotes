@@ -6,6 +6,7 @@ from mednotes.schema.ml import (
     EmbeddedSentencePost,
     QuestionGet,
     QuestionPost,
+    QuestionEdit,
 )
 from mednotes.db.ml import Note, Question
 from mednotes.db.connection import get_session, reset_tables
@@ -54,6 +55,14 @@ def create_question(
         answer=input_question.answer,
         topic=input_question.topic,
     )
+
+
+@router.put("/question", response_model=QuestionGet, status_code=201)
+def edit_question(
+    updated_question: QuestionEdit, sess: Session = Depends(get_session)
+) -> QuestionGet:
+    update = Question.update(sess, updated_question)
+    return update
 
 
 @router.get("/search/note", response_model=list[EmbeddedSentenceGet], status_code=200)

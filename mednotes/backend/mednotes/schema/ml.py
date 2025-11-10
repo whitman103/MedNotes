@@ -14,6 +14,12 @@ class EmbeddedSentenceGet(BaseModel):
     topic: Optional[list[Topic]] = None
 
 
+class EmbeddedSentenceEdit(BaseModel):
+    text: Optional[str] = None
+    topic: Optional[list[Topic]] = None
+    id: int
+
+
 class TopicGet(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,6 +31,13 @@ class QuestionPost(BaseModel):
     text: str
     answer: str
     topic: Optional[list[Topic]] = None
+
+
+class QuestionEdit(BaseModel):
+    text: Optional[str] = None
+    answer: Optional[str] = None
+    topic: Optional[list[Topic]] = None
+    id: int
 
 
 class QuestionGet(BaseModel):

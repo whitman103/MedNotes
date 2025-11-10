@@ -1,7 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Item, ItemContent, ItemTitle } from '@/components/ui/item'
 import { LuAlbum, LuBrain } from "react-icons/lu";
-import { GiHeartOrgan, GiRose, GiScalpel, GiKidneys, GiBabyFace, GiSausage } from "react-icons/gi";
+import { GiHeartOrgan, GiRose, GiScalpel, GiKidneys, GiBabyFace, GiSausage, GiPill } from "react-icons/gi";
 import { BiSolidDonateBlood } from "react-icons/bi";
 import { FaBacteria, FaEye } from "react-icons/fa";
 import { LiaPoopSolid } from "react-icons/lia";
@@ -10,8 +10,9 @@ import { Topic } from '@/generated_client';
 import { cva } from 'class-variance-authority';
 import type { IconType } from 'react-icons/lib';
 import { Button } from '../ui/button';
-
-
+import { SlChemistry } from "react-icons/sl";
+import { FaFaceFlushed } from "react-icons/fa6";
+import { GiDna1 } from "react-icons/gi";
 interface IconColors {
     fill: string;
     stroke: string;
@@ -32,6 +33,10 @@ IconSettings['microbiology'] = { 'fill': 'green', 'stroke': 'black', 'icon': FaB
 IconSettings['obstetrics'] = { 'fill': 'pink', 'stroke': 'black', 'icon': GiBabyFace };
 IconSettings['ophthalmology'] = { 'fill': 'orange', 'stroke': 'black', 'icon': FaEye };
 IconSettings['urology'] = { 'fill': 'red', 'stroke': 'white', 'icon': GiSausage }
+IconSettings['pharmacology'] = { 'fill': 'red', 'stroke': 'black', 'icon': GiPill }
+IconSettings['biochemistry'] = { 'fill': 'blue', 'stroke': 'white', 'icon': SlChemistry }
+IconSettings['dermatology'] = { 'fill': 'pink', 'stroke': 'black', 'icon': FaFaceFlushed }
+IconSettings['genetics'] = { 'fill': 'orange', 'stroke': 'black', 'icon': GiDna1 }
 
 export function TopicsCard({ selected, setSelected }: { selected: string[], setSelected: (string[]) }) {
     function clearSelected() {

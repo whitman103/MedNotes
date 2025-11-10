@@ -9,6 +9,7 @@ class Topic(str, Enum):
     IMMUNOLOGY = "immunology"
     MICROBIOLOGY = "microbiology"
     PATHOLOGY = "pathology"
+    PHARMACOLOGY = "pharmacology"
     ANESTHESIOLOGY = "anesthesiology"
     DERMATOLOGY = "dermatology"
     EMERGENCY = "emergency"

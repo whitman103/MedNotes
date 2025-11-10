@@ -145,6 +145,7 @@ export const Topic = {
     Immunology: 'immunology',
     Microbiology: 'microbiology',
     Pathology: 'pathology',
+    Pharmacology: 'pharmacology',
     Anesthesiology: 'anesthesiology',
     Dermatology: 'dermatology',
     Emergency: 'emergency',

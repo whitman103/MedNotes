@@ -27,6 +27,8 @@ import { IconSettings } from "../topics/topic";
 
 const cardStyle = "rounded-md border flex max-w-screen gap-2"
 const descriptionStyle = "text-lg font-bold"
+const fieldGroupStyle = { 'padding': '2em' }
+const contentStyle = "gap-2"
 
 function NoteQuery({ selected }: { selected: string[] }) {
 
@@ -69,9 +71,9 @@ function NoteQuery({ selected }: { selected: string[] }) {
         <CardDescription className={descriptionStyle}>
             Describe what information you want to retrieve.
         </CardDescription>
-        <CardContent>
+        <CardContent className={contentStyle}>
             <form id="notequeryform" onSubmit={form.handleSubmit(onSubmit)}>
-                <FieldGroup>
+                <FieldGroup style={fieldGroupStyle}>
                     <Controller
                         name="text"
                         control={form.control}
@@ -81,6 +83,21 @@ function NoteQuery({ selected }: { selected: string[] }) {
                                     Search Text
                                 </FieldLabel>
                                 <Input {...field} aria-invalid={fieldState.invalid} placeholder="Type search here" />
+                                {fieldState.invalid && (<FieldError errors={[fieldState.error]} />)}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="result_limit"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel>
+                                    Result Limit
+                                </FieldLabel>
+                                <Input {...field}
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="Limit result" />
                                 {fieldState.invalid && (<FieldError errors={[fieldState.error]} />)}
                             </Field>
                         )}
@@ -112,9 +129,9 @@ function NoteCreate({ selected }: { selected: string[] }) {
         <CardDescription className={descriptionStyle}>
             Write the note that you'd like to submit. Select the topics from the buttons below.
         </CardDescription>
-        <CardContent>
+        <CardContent className={contentStyle}>
             <form id="notecreateform" onSubmit={form.handleSubmit(onSubmit)}>
-                <FieldGroup>
+                <FieldGroup style={fieldGroupStyle}>
                     <Controller
                         name="text"
                         control={form.control}
@@ -156,9 +173,9 @@ function QuestionCreate({ selected }: { selected: string[] }) {
         <CardDescription className={descriptionStyle}>
             Write the question that you'd like to submit.
         </CardDescription>
-        <CardContent>
+        <CardContent className={contentStyle}>
             <form id="questioncreateform" onSubmit={form.handleSubmit(onSubmit)}>
-                <FieldGroup>
+                <FieldGroup style={fieldGroupStyle}>
                     <Controller
                         name="text"
                         control={form.control}
@@ -246,9 +263,9 @@ function QuestionQuery({ selected }: { selected: string[] }) {
         <CardDescription className="text-lg font-bold">
             Describe what information you want to be questioned on.
         </CardDescription>
-        <CardContent className="gap-2">
+        <CardContent className={contentStyle}>
             <form id="notequeryform" onSubmit={form.handleSubmit(onSubmit)}>
-                <FieldGroup style={{ 'padding': '2em' }}>
+                <FieldGroup style={fieldGroupStyle}>
                     <Controller
                         name="text"
                         control={form.control}
@@ -258,6 +275,20 @@ function QuestionQuery({ selected }: { selected: string[] }) {
                                     Search Text
                                 </FieldLabel>
                                 <Input {...field} aria-invalid={fieldState.invalid} placeholder="Type search here" />
+                                {fieldState.invalid && (<FieldError errors={[fieldState.error]} />)}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="result_limit"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel>
+                                    Number Requested
+                                </FieldLabel>
+                                <Input {...field} aria-invalid={fieldState.invalid}
+                                    placeholder="How many results requested?" />
                                 {fieldState.invalid && (<FieldError errors={[fieldState.error]} />)}
                             </Field>
                         )}
