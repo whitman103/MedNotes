@@ -4,7 +4,7 @@ services:
     mednotes-api:
       profiles: ["api"]
       container_name: mednotes_api
-      image: mednotes_api
+      image: mednotes_api:0.0.0
       build: 
         context: .
         dockerfile: containers/Dockerfile.api

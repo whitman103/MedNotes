@@ -12,7 +12,7 @@ import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import { useState } from "react";
 
-const formSchema = z.object({
+export const formSchema = z.object({
     text: z.string(),
     result_limit: z.number().int(),
     answer: z.string()
@@ -320,6 +320,9 @@ export function QueryTabs(props: QueryTabsProps) {
                 <TabsTrigger value="questions">
                     Questions
                 </TabsTrigger>
+                <TabsTrigger value="media">
+                    Media
+                </TabsTrigger>
             </TabsList>
             <TabsContent value="notes">
                 <div className="flex justify-center items-center space-x-2">
@@ -338,6 +341,9 @@ export function QueryTabs(props: QueryTabsProps) {
                     <Label color="white" className="text-lg" htmlFor="questionmode">{enabled ? "Query" : "Create"}</Label>
                 </div>
                 {enabled ? <QuestionQuery selected={props.selected} /> : <QuestionCreate selected={props.selected} />}
+            </TabsContent>
+            <TabsContent value="media">
+
             </TabsContent>
         </Tabs>
     </div >

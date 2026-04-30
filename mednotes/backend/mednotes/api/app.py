@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from mednotes.api.ml import router as ml_router
+from mednotes.api.media import router as asset_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 
 app.include_router(ml_router, prefix="/ml", tags=["ml"])
+app.include_router(asset_router, prefix="/asset", tags=["asset"])
 
 
 app.add_middleware(
