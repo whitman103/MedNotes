@@ -7,10 +7,18 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "@/components/ui/input"
 import { Button } from "../ui/button";
 import { useFetchNotes, useCreateNote, useCreateQuestion, useFetchQuestions } from "@/hooks/notes";
-import { Topic, type EmbeddedSentenceGet, type QuestionGet } from "@/generated_client";
+import { useCreatePhotoAsset, useDeletePhotoAsset, useFetchAssets } from "@/hooks/assets";
+import { getPhotoAssetUrl } from "@/client";
+import { Topic, type EmbeddedSentenceGet, type PhotoAssetGet, type QuestionGet } from "@/generated_client";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
-import { useState } from "react";
+import { useState, useEffect, type ReactNode } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "../data-table/data-table";
+import { toast } from "sonner";
+import { X } from "lucide-react";
+
+import { IconSettings } from "../topics/topic";
 
 export const formSchema = z.object({
     text: z.string(),
@@ -20,15 +28,327 @@ export const formSchema = z.object({
 
 export type queryFormDataType = z.infer<typeof formSchema>;
 
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../data-table/data-table";
+export const photoFormSchema = z.object({
+    description: z.string(),
+    format: z.string().min(1, "Format is required"),
+})
 
-import { IconSettings } from "../topics/topic";
+export type photoFormDataType = z.infer<typeof photoFormSchema>;
 
 const cardStyle = "rounded-md border flex max-w-screen gap-2"
 const descriptionStyle = "text-lg font-bold"
 const fieldGroupStyle = { 'padding': '2em' }
 const contentStyle = "gap-2"
+
+function formatFromFile(file: File): string {
+    const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+    return extension === "jpg" ? "jpeg" : extension;
+}
+
+function Modal({
+    open,
+    onClose,
+    children,
+    className = "max-w-lg w-full mx-4 rounded-md border bg-background p-6 shadow-lg",
+}: {
+    open: boolean;
+    onClose: () => void;
+    children: ReactNode;
+    className?: string;
+}) {
+    if (!open) {
+        return null;
+    }
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            onClick={onClose}
+        >
+            <div className={className} onClick={(event) => event.stopPropagation()}>
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function PhotoGallery({ photos }: { photos: PhotoAssetGet[] }) {
+    const deletePhotoAssetHook = useDeletePhotoAsset();
+    const [photoToView, setPhotoToView] = useState<PhotoAssetGet | null>(null);
+    const [photoToDelete, setPhotoToDelete] = useState<PhotoAssetGet | null>(null);
+
+    function confirmDelete() {
+        if (!photoToDelete) {
+            return;
+        }
+
+        deletePhotoAssetHook.mutate(photoToDelete, {
+            onSuccess: () => {
+                setPhotoToDelete(null);
+                if (photoToView?.asset_id === photoToDelete.asset_id) {
+                    setPhotoToView(null);
+                }
+            },
+        });
+    }
+
+    if (photos.length === 0) {
+        return (
+            <p className="text-muted-foreground text-sm mt-4">
+                No photos uploaded yet.
+            </p>
+        );
+    }
+
+    return (
+        <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {photos.map((photo) => (
+                    <div
+                        key={photo.asset_id}
+                        className="group relative overflow-hidden rounded-md border bg-background"
+                    >
+                        <button
+                            type="button"
+                            aria-label={`Delete ${photo.description || "photo"}`}
+                            className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity hover:bg-black group-hover:opacity-100"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                setPhotoToDelete(photo);
+                            }}
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            className="block w-full cursor-pointer"
+                            onClick={() => setPhotoToView(photo)}
+                        >
+                            <img
+                                src={getPhotoAssetUrl(photo.asset_id)}
+                                alt={photo.description || `Photo ${photo.asset_id}`}
+                                className="h-48 w-full object-cover transition-transform group-hover:scale-[1.02]"
+                                loading="lazy"
+                            />
+                        </button>
+                        <div className="p-3 space-y-1">
+                            <p className="font-medium">
+                                {photo.description || "Untitled photo"}
+                            </p>
+                            <p className="text-sm text-muted-foreground uppercase">
+                                {photo.format}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <Modal
+                open={photoToView !== null}
+                onClose={() => setPhotoToView(null)}
+                className="max-w-[95vw] max-h-[95vh] w-auto rounded-md border bg-background p-2 shadow-lg"
+            >
+                {photoToView ? (
+                    <div className="flex max-h-[90vh] flex-col gap-3">
+                        <img
+                            src={getPhotoAssetUrl(photoToView.asset_id)}
+                            alt={photoToView.description || `Photo ${photoToView.asset_id}`}
+                            className="max-h-[80vh] max-w-[90vw] object-contain"
+                        />
+                        <div className="px-2 pb-2">
+                            <p className="font-medium">
+                                {photoToView.description || "Untitled photo"}
+                            </p>
+                            <p className="text-sm text-muted-foreground uppercase">
+                                {photoToView.format}
+                            </p>
+                        </div>
+                    </div>
+                ) : null}
+            </Modal>
+
+            <Modal open={photoToDelete !== null} onClose={() => setPhotoToDelete(null)}>
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">Delete photo?</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Are you sure you want to delete{" "}
+                            <span className="font-medium text-foreground">
+                                {photoToDelete?.description || "this photo"}
+                            </span>
+                            ? This action cannot be undone.
+                        </p>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => setPhotoToDelete(null)}
+                            disabled={deletePhotoAssetHook.isPending}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDelete}
+                            disabled={deletePhotoAssetHook.isPending}
+                        >
+                            {deletePhotoAssetHook.isPending ? "Deleting..." : "Delete"}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
+        </>
+    );
+}
+
+function PhotoCreate() {
+    const createPhotoAssetHook = useCreatePhotoAsset();
+    const { data: assets, refetch: refetchAssets } = useFetchAssets();
+    const [fileInputKey, setFileInputKey] = useState(0);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    const form = useForm<photoFormDataType>({
+        resolver: zodResolver(photoFormSchema),
+        defaultValues: { description: "", format: "" },
+    });
+
+    function onSubmit(data: photoFormDataType) {
+        if (!selectedFile) {
+            toast.error("Choose a photo to upload.");
+            return;
+        }
+
+        createPhotoAssetHook.mutate(
+            {
+                file: selectedFile,
+                format: data.format,
+                description: data.description,
+            },
+            {
+                onSuccess: () => {
+                    form.reset();
+                    setSelectedFile(null);
+                    setFileInputKey((key) => key + 1);
+                    refetchAssets();
+                },
+            },
+        );
+    }
+
+    const photoAssets = (assets ?? []).filter(
+        (asset): asset is PhotoAssetGet => asset.type === "PhotoAsset",
+    );
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreviewUrl(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreviewUrl(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [selectedFile]);
+
+    return (
+        <div className="flex flex-col gap-4">
+            <Card className={cardStyle}>
+                <CardHeader>
+                    <CardTitle className="text-lg">Upload Photo Asset</CardTitle>
+                </CardHeader>
+                <CardDescription className={descriptionStyle}>
+                    Add a photo to the media library. It will be compressed and stored on the server.
+                </CardDescription>
+                <CardContent className={contentStyle}>
+                    <form id="photocreateform" onSubmit={form.handleSubmit(onSubmit)}>
+                        <FieldGroup style={fieldGroupStyle}>
+                            <Field>
+                                <FieldLabel>Photo File</FieldLabel>
+                                <Input
+                                    key={fileInputKey}
+                                    type="file"
+                                    accept="image/*"
+                                    aria-invalid={!selectedFile && form.formState.isSubmitted}
+                                    onChange={(event) => {
+                                        const file = event.target.files?.[0] ?? null;
+                                        setSelectedFile(file);
+                                        if (file) {
+                                            form.setValue("format", formatFromFile(file), {
+                                                shouldValidate: true,
+                                            });
+                                        } else {
+                                            form.setValue("format", "", { shouldValidate: true });
+                                        }
+                                    }}
+                                />
+                            </Field>
+                            {previewUrl ? (
+                                <img
+                                    src={previewUrl}
+                                    alt="Selected photo preview"
+                                    className="max-h-48 rounded-md border object-contain"
+                                />
+                            ) : null}
+                            <Controller
+                                name="description"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Description</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="Describe this photo"
+                                        />
+                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                name="format"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel>Format</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="jpeg, png, webp..."
+                                        />
+                                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    </Field>
+                                )}
+                            />
+                        </FieldGroup>
+                    </form>
+                </CardContent>
+                <CardFooter>
+                    <Button
+                        className="justify-center hover:bg-muted-foreground"
+                        type="submit"
+                        form="photocreateform"
+                        disabled={createPhotoAssetHook.isPending}
+                    >
+                        {createPhotoAssetHook.isPending ? "Uploading..." : "Upload Photo"}
+                    </Button>
+                </CardFooter>
+            </Card>
+
+            <Card className={cardStyle}>
+                <CardHeader>
+                    <CardTitle className="text-lg">Photo Library</CardTitle>
+                </CardHeader>
+                <CardDescription className={descriptionStyle}>
+                    Browse uploaded photo assets.
+                </CardDescription>
+                <CardContent className={contentStyle}>
+                    <PhotoGallery photos={photoAssets} />
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
 
 function NoteQuery({ selected }: { selected: string[] }) {
 
@@ -343,7 +663,7 @@ export function QueryTabs(props: QueryTabsProps) {
                 {enabled ? <QuestionQuery selected={props.selected} /> : <QuestionCreate selected={props.selected} />}
             </TabsContent>
             <TabsContent value="media">
-
+                <PhotoCreate />
             </TabsContent>
         </Tabs>
     </div >

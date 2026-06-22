@@ -26,6 +26,49 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface AssetGet
+ */
+export interface AssetGet {
+    /**
+     * 
+     * @type {number}
+     * @memberof AssetGet
+     */
+    'asset_id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssetGet
+     */
+    'asset_path': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AssetGet
+     */
+    'compressed': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssetGet
+     */
+    'description': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssetGet
+     */
+    'size': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssetGet
+     */
+    'type': string;
+}
+/**
+ * 
+ * @export
  * @interface EmbeddedSentenceEdit
  */
 export interface EmbeddedSentenceEdit {
@@ -111,6 +154,55 @@ export interface HTTPValidationError {
  * @interface LocationInner
  */
 export interface LocationInner {
+}
+/**
+ * 
+ * @export
+ * @interface PhotoAssetGet
+ */
+export interface PhotoAssetGet {
+    /**
+     * 
+     * @type {number}
+     * @memberof PhotoAssetGet
+     */
+    'asset_id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PhotoAssetGet
+     */
+    'asset_path': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PhotoAssetGet
+     */
+    'compressed': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PhotoAssetGet
+     */
+    'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PhotoAssetGet
+     */
+    'format': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PhotoAssetGet
+     */
+    'size': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PhotoAssetGet
+     */
+    'type': string;
 }
 /**
  * 
@@ -275,6 +367,544 @@ export interface ValidationError {
      */
     'type': string;
 }
+/**
+ * 
+ * @export
+ * @interface VolumeAssetGet
+ */
+export interface VolumeAssetGet {
+    /**
+     * 
+     * @type {number}
+     * @memberof VolumeAssetGet
+     */
+    'asset_id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VolumeAssetGet
+     */
+    'asset_path': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VolumeAssetGet
+     */
+    'compressed': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof VolumeAssetGet
+     */
+    'description': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VolumeAssetGet
+     */
+    'size': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VolumeAssetGet
+     */
+    'type': string;
+}
+
+/**
+ * AssetApi - axios parameter creator
+ * @export
+ */
+export const AssetApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Create Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAssetAssetCreateAssetPost: async (description: string, file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'description' is not null or undefined
+            assertParamExists('createAssetAssetCreateAssetPost', 'description', description)
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('createAssetAssetCreateAssetPost', 'file', file)
+            const localVarPath = `/asset/create-asset`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (description !== undefined) { 
+                localVarFormParams.append('description', description as any);
+            }
+    
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create Photo Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {string} format 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPhotoAssetAssetCreatePhotoAssetPost: async (description: string, file: File, format: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'description' is not null or undefined
+            assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'description', description)
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'file', file)
+            // verify required parameter 'format' is not null or undefined
+            assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'format', format)
+            const localVarPath = `/asset/create-photo-asset`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (description !== undefined) { 
+                localVarFormParams.append('description', description as any);
+            }
+    
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (format !== undefined) { 
+                localVarFormParams.append('format', format as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create Volume Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createVolumeAssetAssetCreateVolumeAssetPost: async (description: string, file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'description' is not null or undefined
+            assertParamExists('createVolumeAssetAssetCreateVolumeAssetPost', 'description', description)
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('createVolumeAssetAssetCreateVolumeAssetPost', 'file', file)
+            const localVarPath = `/asset/create-volume-asset`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (description !== undefined) { 
+                localVarFormParams.append('description', description as any);
+            }
+    
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePhotoAssetAssetPhotoAssetIdDelete: async (assetId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'assetId' is not null or undefined
+            assertParamExists('deletePhotoAssetAssetPhotoAssetIdDelete', 'assetId', assetId)
+            const localVarPath = `/asset/photo/{asset_id}`
+                .replace(`{${"asset_id"}}`, encodeURIComponent(String(assetId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPhotoAssetAssetPhotoAssetIdGet: async (assetId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'assetId' is not null or undefined
+            assertParamExists('getPhotoAssetAssetPhotoAssetIdGet', 'assetId', assetId)
+            const localVarPath = `/asset/photo/{asset_id}`
+                .replace(`{${"asset_id"}}`, encodeURIComponent(String(assetId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List Assets
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAssetsAssetListAssetsGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/asset/list-assets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AssetApi - functional programming interface
+ * @export
+ */
+export const AssetApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AssetApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createAssetAssetCreateAssetPost(description: string, file: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssetGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createAssetAssetCreateAssetPost(description, file, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Create Photo Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {string} format 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PhotoAssetGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Create Volume Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VolumeAssetGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createVolumeAssetAssetCreateVolumeAssetPost(description, file, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deletePhotoAssetAssetPhotoAssetIdDelete(assetId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePhotoAssetAssetPhotoAssetIdDelete(assetId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPhotoAssetAssetPhotoAssetIdGet(assetId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPhotoAssetAssetPhotoAssetIdGet(assetId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary List Assets
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAssetsAssetListAssetsGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AssetGet>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAssetsAssetListAssetsGet(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * AssetApi - factory interface
+ * @export
+ */
+export const AssetApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AssetApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAssetAssetCreateAssetPost(description: string, file: File, options?: any): AxiosPromise<AssetGet> {
+            return localVarFp.createAssetAssetCreateAssetPost(description, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create Photo Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {string} format 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: any): AxiosPromise<PhotoAssetGet> {
+            return localVarFp.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create Volume Asset
+         * @param {string} description 
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: any): AxiosPromise<VolumeAssetGet> {
+            return localVarFp.createVolumeAssetAssetCreateVolumeAssetPost(description, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePhotoAssetAssetPhotoAssetIdDelete(assetId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deletePhotoAssetAssetPhotoAssetIdDelete(assetId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Photo Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPhotoAssetAssetPhotoAssetIdGet(assetId: number, options?: any): AxiosPromise<any> {
+            return localVarFp.getPhotoAssetAssetPhotoAssetIdGet(assetId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List Assets
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAssetsAssetListAssetsGet(options?: any): AxiosPromise<Array<AssetGet>> {
+            return localVarFp.listAssetsAssetListAssetsGet(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AssetApi - object-oriented interface
+ * @export
+ * @class AssetApi
+ * @extends {BaseAPI}
+ */
+export class AssetApi extends BaseAPI {
+    /**
+     * 
+     * @summary Create Asset
+     * @param {string} description 
+     * @param {File} file 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public createAssetAssetCreateAssetPost(description: string, file: File, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).createAssetAssetCreateAssetPost(description, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create Photo Asset
+     * @param {string} description 
+     * @param {File} file 
+     * @param {string} format 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create Volume Asset
+     * @param {string} description 
+     * @param {File} file 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).createVolumeAssetAssetCreateVolumeAssetPost(description, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Photo Asset
+     * @param {number} assetId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public deletePhotoAssetAssetPhotoAssetIdDelete(assetId: number, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).deletePhotoAssetAssetPhotoAssetIdDelete(assetId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Photo Asset
+     * @param {number} assetId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public getPhotoAssetAssetPhotoAssetIdGet(assetId: number, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).getPhotoAssetAssetPhotoAssetIdGet(assetId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List Assets
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public listAssetsAssetListAssetsGet(options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).listAssetsAssetListAssetsGet(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
 
 /**
  * MlApi - axios parameter creator

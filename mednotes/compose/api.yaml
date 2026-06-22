@@ -33,6 +33,7 @@ services:
 
       volumes:
       - "./backend/mednotes:/mednotes/mednotes"
+      - "./data:/mednotes/data"
 
     mednotes-db:
       profiles: ['api']

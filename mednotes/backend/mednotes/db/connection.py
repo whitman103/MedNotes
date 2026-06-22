@@ -21,6 +21,10 @@ class Base(DeclarativeBase):
 
 
 def reset_tables():
+    import mednotes.db.asset  # noqa: F401
+    from mednotes.storage.assets import clear_asset_storage
+
+    clear_asset_storage()
     with global_engine.begin() as conn:
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     Base.metadata.drop_all(bind=global_engine)
