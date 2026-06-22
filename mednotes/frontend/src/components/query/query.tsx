@@ -6,17 +6,17 @@ import * as z from "zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "@/components/ui/input"
 import { Button } from "../ui/button";
-import { useFetchNotes, useCreateNote, useCreateQuestion, useFetchQuestions } from "@/hooks/notes";
-import { useCreatePhotoAsset, useDeletePhotoAsset, useFetchAssets } from "@/hooks/assets";
-import { getPhotoAssetUrl } from "@/client";
-import { Topic, type EmbeddedSentenceGet, type PhotoAssetGet, type QuestionGet } from "@/generated_client";
+import { useFetchNotes, useCreateNote, useCreateQuestion, useFetchQuestions, useDeleteNote, useDeleteQuestion } from "@/hooks/notes";
+import { useCreatePhotoAsset, useSearchPhotos } from "@/hooks/assets";
+import { Topic, type EmbeddedSentenceGet, type QuestionGet } from "@/generated_client";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 import { useState, useEffect, type ReactNode } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../data-table/data-table";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+
+import { AssociatedPhotos, PhotoGallery, PhotoPicker } from "@/components/media/photos";
 
 import { IconSettings } from "../topics/topic";
 
@@ -45,16 +45,20 @@ function formatFromFile(file: File): string {
     return extension === "jpg" ? "jpeg" : extension;
 }
 
-function Modal({
+function DeleteConfirmModal({
     open,
     onClose,
-    children,
-    className = "max-w-lg w-full mx-4 rounded-md border bg-background p-6 shadow-lg",
+    onConfirm,
+    isPending,
+    title,
+    description,
 }: {
     open: boolean;
     onClose: () => void;
-    children: ReactNode;
-    className?: string;
+    onConfirm: () => void;
+    isPending: boolean;
+    title: string;
+    description: ReactNode;
 }) {
     if (!open) {
         return null;
@@ -65,147 +69,37 @@ function Modal({
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
             onClick={onClose}
         >
-            <div className={className} onClick={(event) => event.stopPropagation()}>
-                {children}
+            <div
+                className="max-w-lg w-full mx-4 rounded-md border bg-background p-6 shadow-lg"
+                onClick={(event) => event.stopPropagation()}
+            >
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">{title}</h3>
+                        <p className="text-sm text-muted-foreground">{description}</p>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={onClose} disabled={isPending}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
+                            {isPending ? "Deleting..." : "Delete"}
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
 
-function PhotoGallery({ photos }: { photos: PhotoAssetGet[] }) {
-    const deletePhotoAssetHook = useDeletePhotoAsset();
-    const [photoToView, setPhotoToView] = useState<PhotoAssetGet | null>(null);
-    const [photoToDelete, setPhotoToDelete] = useState<PhotoAssetGet | null>(null);
-
-    function confirmDelete() {
-        if (!photoToDelete) {
-            return;
-        }
-
-        deletePhotoAssetHook.mutate(photoToDelete, {
-            onSuccess: () => {
-                setPhotoToDelete(null);
-                if (photoToView?.asset_id === photoToDelete.asset_id) {
-                    setPhotoToView(null);
-                }
-            },
-        });
-    }
-
-    if (photos.length === 0) {
-        return (
-            <p className="text-muted-foreground text-sm mt-4">
-                No photos uploaded yet.
-            </p>
-        );
-    }
-
-    return (
-        <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {photos.map((photo) => (
-                    <div
-                        key={photo.asset_id}
-                        className="group relative overflow-hidden rounded-md border bg-background"
-                    >
-                        <button
-                            type="button"
-                            aria-label={`Delete ${photo.description || "photo"}`}
-                            className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white opacity-0 transition-opacity hover:bg-black group-hover:opacity-100"
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                setPhotoToDelete(photo);
-                            }}
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
-                        <button
-                            type="button"
-                            className="block w-full cursor-pointer"
-                            onClick={() => setPhotoToView(photo)}
-                        >
-                            <img
-                                src={getPhotoAssetUrl(photo.asset_id)}
-                                alt={photo.description || `Photo ${photo.asset_id}`}
-                                className="h-48 w-full object-cover transition-transform group-hover:scale-[1.02]"
-                                loading="lazy"
-                            />
-                        </button>
-                        <div className="p-3 space-y-1">
-                            <p className="font-medium">
-                                {photo.description || "Untitled photo"}
-                            </p>
-                            <p className="text-sm text-muted-foreground uppercase">
-                                {photo.format}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <Modal
-                open={photoToView !== null}
-                onClose={() => setPhotoToView(null)}
-                className="max-w-[95vw] max-h-[95vh] w-auto rounded-md border bg-background p-2 shadow-lg"
-            >
-                {photoToView ? (
-                    <div className="flex max-h-[90vh] flex-col gap-3">
-                        <img
-                            src={getPhotoAssetUrl(photoToView.asset_id)}
-                            alt={photoToView.description || `Photo ${photoToView.asset_id}`}
-                            className="max-h-[80vh] max-w-[90vw] object-contain"
-                        />
-                        <div className="px-2 pb-2">
-                            <p className="font-medium">
-                                {photoToView.description || "Untitled photo"}
-                            </p>
-                            <p className="text-sm text-muted-foreground uppercase">
-                                {photoToView.format}
-                            </p>
-                        </div>
-                    </div>
-                ) : null}
-            </Modal>
-
-            <Modal open={photoToDelete !== null} onClose={() => setPhotoToDelete(null)}>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">Delete photo?</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Are you sure you want to delete{" "}
-                            <span className="font-medium text-foreground">
-                                {photoToDelete?.description || "this photo"}
-                            </span>
-                            ? This action cannot be undone.
-                        </p>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => setPhotoToDelete(null)}
-                            disabled={deletePhotoAssetHook.isPending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={confirmDelete}
-                            disabled={deletePhotoAssetHook.isPending}
-                        >
-                            {deletePhotoAssetHook.isPending ? "Deleting..." : "Delete"}
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
-        </>
-    );
-}
-
-function PhotoCreate() {
+function PhotoCreate({ selected }: { selected: string[] }) {
     const createPhotoAssetHook = useCreatePhotoAsset();
-    const { data: assets, refetch: refetchAssets } = useFetchAssets();
+    const topics = selected as Topic[];
     const [fileInputKey, setFileInputKey] = useState(0);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [searchText, setSearchText] = useState("");
+    const [submittedSearch, setSubmittedSearch] = useState("");
+    const { data: photos, refetch: refetchPhotos } = useSearchPhotos(submittedSearch, topics);
 
     const form = useForm<photoFormDataType>({
         resolver: zodResolver(photoFormSchema),
@@ -223,21 +117,25 @@ function PhotoCreate() {
                 file: selectedFile,
                 format: data.format,
                 description: data.description,
+                topics,
             },
             {
                 onSuccess: () => {
                     form.reset();
                     setSelectedFile(null);
                     setFileInputKey((key) => key + 1);
-                    refetchAssets();
+                    refetchPhotos();
                 },
             },
         );
     }
 
-    const photoAssets = (assets ?? []).filter(
-        (asset): asset is PhotoAssetGet => asset.type === "PhotoAsset",
-    );
+    function onSearchSubmit(event: React.FormEvent) {
+        event.preventDefault();
+        setSubmittedSearch(searchText.trim());
+    }
+
+    const photoAssets = photos ?? [];
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -258,7 +156,7 @@ function PhotoCreate() {
                     <CardTitle className="text-lg">Upload Photo Asset</CardTitle>
                 </CardHeader>
                 <CardDescription className={descriptionStyle}>
-                    Add a photo to the media library. It will be compressed and stored on the server.
+                    Add a photo to the media library. It will be tagged with the topics selected below.
                 </CardDescription>
                 <CardContent className={contentStyle}>
                     <form id="photocreateform" onSubmit={form.handleSubmit(onSubmit)}>
@@ -340,9 +238,22 @@ function PhotoCreate() {
                     <CardTitle className="text-lg">Photo Library</CardTitle>
                 </CardHeader>
                 <CardDescription className={descriptionStyle}>
-                    Browse uploaded photo assets.
+                    Search photos by description. Results are filtered by the selected topics below.
                 </CardDescription>
                 <CardContent className={contentStyle}>
+                    <form onSubmit={onSearchSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <Field className="flex-1">
+                            <FieldLabel>Search by description</FieldLabel>
+                            <Input
+                                value={searchText}
+                                onChange={(event) => setSearchText(event.target.value)}
+                                placeholder="Describe what you're looking for..."
+                            />
+                        </Field>
+                        <Button type="submit" variant="secondary">
+                            Search
+                        </Button>
+                    </form>
                     <PhotoGallery photos={photoAssets} />
                 </CardContent>
             </Card>
@@ -354,15 +265,35 @@ function NoteQuery({ selected }: { selected: string[] }) {
 
     const form = useForm<queryFormDataType>({ resolver: zodResolver(formSchema), defaultValues: { text: "", result_limit: 5, answer: 'Default Answer' } });
     const { data: notes, refetch: refetchNotes } = useFetchNotes(form, selected as Topic[]);
+    const deleteNoteHook = useDeleteNote();
+    const [noteToDelete, setNoteToDelete] = useState<EmbeddedSentenceGet | null>(null);
 
     function onSubmit(data: queryFormDataType) {
         refetchNotes();
+    }
+
+    function confirmDeleteNote() {
+        if (!noteToDelete) {
+            return;
+        }
+
+        deleteNoteHook.mutate(noteToDelete.note_id, {
+            onSuccess: () => {
+                setNoteToDelete(null);
+                refetchNotes();
+            },
+        });
     }
 
     const columns: ColumnDef<EmbeddedSentenceGet>[] = [
         {
             accessorKey: "text",
             header: "Note Text"
+        },
+        {
+            id: "photos",
+            header: "Photos",
+            cell: ({ row }) => <AssociatedPhotos photos={row.original.photos} />,
         },
         {
             accessorKey: "topic",
@@ -381,7 +312,21 @@ function NoteQuery({ selected }: { selected: string[] }) {
                     );
                 })
             }
-        }
+        },
+        {
+            id: "actions",
+            header: "",
+            cell: ({ row }) => (
+                <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setNoteToDelete(row.original)}
+                >
+                    Delete
+                </Button>
+            ),
+        },
     ]
 
     return <Card className={cardStyle}>
@@ -425,6 +370,22 @@ function NoteQuery({ selected }: { selected: string[] }) {
                 </FieldGroup>
             </form>
             {((notes != undefined) && notes.length > 0) ? <DataTable columns={columns} data={notes} /> : ''}
+            <DeleteConfirmModal
+                open={noteToDelete !== null}
+                onClose={() => setNoteToDelete(null)}
+                onConfirm={confirmDeleteNote}
+                isPending={deleteNoteHook.isPending}
+                title="Delete note?"
+                description={
+                    <>
+                        Are you sure you want to delete{" "}
+                        <span className="font-medium text-foreground">
+                            {noteToDelete?.text || "this note"}
+                        </span>
+                        ? This action cannot be undone.
+                    </>
+                }
+            />
         </CardContent>
         <CardFooter>
             <Button className="justify-center hover:bg-muted-foreground" type="submit" form="notequeryform">Submit Query</Button>
@@ -434,12 +395,18 @@ function NoteQuery({ selected }: { selected: string[] }) {
 
 function NoteCreate({ selected }: { selected: string[] }) {
     const createNoteHook = useCreateNote();
+    const [selectedPhotoIds, setSelectedPhotoIds] = useState<number[]>([]);
 
     const form = useForm<queryFormDataType>({ resolver: zodResolver(formSchema), defaultValues: { text: "", answer: '', result_limit: 5 } });
 
     function onSubmit(data: queryFormDataType) {
-        createNoteHook.mutate({ note_text: data['text'], topics: selected as Topic[] });
+        createNoteHook.mutate({
+            note_text: data["text"],
+            topics: selected as Topic[],
+            photo_asset_ids: selectedPhotoIds,
+        });
         form.reset();
+        setSelectedPhotoIds([]);
     }
 
     return <Card className={cardStyle}>
@@ -466,6 +433,11 @@ function NoteCreate({ selected }: { selected: string[] }) {
                             </Field>
                         )}
                     />
+                    <PhotoPicker
+                        selectedPhotoIds={selectedPhotoIds}
+                        onChange={setSelectedPhotoIds}
+                        topics={selected as Topic[]}
+                    />
                 </FieldGroup>
             </form>
         </CardContent>
@@ -480,10 +452,17 @@ function NoteCreate({ selected }: { selected: string[] }) {
 function QuestionCreate({ selected }: { selected: string[] }) {
 
     const createQuestion = useCreateQuestion();
+    const [selectedPhotoIds, setSelectedPhotoIds] = useState<number[]>([]);
     const form = useForm<queryFormDataType>({ resolver: zodResolver(formSchema), defaultValues: { text: "", result_limit: 5, answer: '' } });
 
     function onSubmit(data: z.infer<typeof formSchema>) {
-        createQuestion.mutate({ question_text: data['text'], answer_text: data['answer'], topics: selected as Topic[] });
+        createQuestion.mutate({
+            question_text: data["text"],
+            answer_text: data["answer"],
+            topics: selected as Topic[],
+            photo_asset_ids: selectedPhotoIds,
+        });
+        setSelectedPhotoIds([]);
     }
 
     return <Card className={cardStyle}>
@@ -524,6 +503,11 @@ function QuestionCreate({ selected }: { selected: string[] }) {
                             </Field>
                         )}
                     />
+                    <PhotoPicker
+                        selectedPhotoIds={selectedPhotoIds}
+                        onChange={setSelectedPhotoIds}
+                        topics={selected as Topic[]}
+                    />
                 </FieldGroup>
             </form>
         </CardContent>
@@ -537,9 +521,24 @@ function QuestionQuery({ selected }: { selected: string[] }) {
     const form = useForm<queryFormDataType>({ resolver: zodResolver(formSchema), defaultValues: { text: "", result_limit: 5, answer: 'Default Answer' } });
 
     const { data: questions, refetch: refetchQuestions } = useFetchQuestions(form, selected as Topic[]);
+    const deleteQuestionHook = useDeleteQuestion();
+    const [questionToDelete, setQuestionToDelete] = useState<QuestionGet | null>(null);
 
     function onSubmit(data: queryFormDataType) {
         refetchQuestions();
+    }
+
+    function confirmDeleteQuestion() {
+        if (!questionToDelete) {
+            return;
+        }
+
+        deleteQuestionHook.mutate(questionToDelete.question_id, {
+            onSuccess: () => {
+                setQuestionToDelete(null);
+                refetchQuestions();
+            },
+        });
     }
 
     const columns: ColumnDef<QuestionGet>[] = [
@@ -555,6 +554,11 @@ function QuestionQuery({ selected }: { selected: string[] }) {
                     {row.getValue('answer')}
                 </div>
             }
+        },
+        {
+            id: "photos",
+            header: "Photos",
+            cell: ({ row }) => <AssociatedPhotos photos={row.original.photos} />,
         },
         {
             accessorKey: "topic",
@@ -573,7 +577,21 @@ function QuestionQuery({ selected }: { selected: string[] }) {
                     );
                 })
             }
-        }
+        },
+        {
+            id: "actions",
+            header: "",
+            cell: ({ row }) => (
+                <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setQuestionToDelete(row.original)}
+                >
+                    Delete
+                </Button>
+            ),
+        },
     ]
 
     return <Card className={cardStyle}>
@@ -584,7 +602,7 @@ function QuestionQuery({ selected }: { selected: string[] }) {
             Describe what information you want to be questioned on.
         </CardDescription>
         <CardContent className={contentStyle}>
-            <form id="notequeryform" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id="questionqueryform" onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup style={fieldGroupStyle}>
                     <Controller
                         name="text"
@@ -616,9 +634,25 @@ function QuestionQuery({ selected }: { selected: string[] }) {
                 </FieldGroup>
             </form>
             {((questions != undefined) && questions.length > 0) ? <DataTable columns={columns} data={questions} /> : ''}
+            <DeleteConfirmModal
+                open={questionToDelete !== null}
+                onClose={() => setQuestionToDelete(null)}
+                onConfirm={confirmDeleteQuestion}
+                isPending={deleteQuestionHook.isPending}
+                title="Delete question?"
+                description={
+                    <>
+                        Are you sure you want to delete{" "}
+                        <span className="font-medium text-foreground">
+                            {questionToDelete?.text || "this question"}
+                        </span>
+                        ? This action cannot be undone.
+                    </>
+                }
+            />
         </CardContent>
         <CardFooter>
-            <Button className="justify-center hover:bg-muted-foreground border" style={{ 'padding': '1em' }} type="submit" form="notequeryform">Submit Query</Button>
+            <Button className="justify-center hover:bg-muted-foreground border" style={{ 'padding': '1em' }} type="submit" form="questionqueryform">Submit Query</Button>
         </CardFooter>
     </Card >
 }
@@ -663,7 +697,7 @@ export function QueryTabs(props: QueryTabsProps) {
                 {enabled ? <QuestionQuery selected={props.selected} /> : <QuestionCreate selected={props.selected} />}
             </TabsContent>
             <TabsContent value="media">
-                <PhotoCreate />
+                <PhotoCreate selected={props.selected} />
             </TabsContent>
         </Tabs>
     </div >

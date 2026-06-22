@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from contextlib import asynccontextmanager
 from sentence_transformers import SentenceTransformer
 from mednotes.schema.ml import (
@@ -9,6 +9,7 @@ from mednotes.schema.ml import (
     QuestionPost,
     QuestionEdit,
 )
+from mednotes.api.serializers import photos_to_schema
 from mednotes.db.ml import Note, Question
 from mednotes.db.connection import get_session, reset_tables
 from typing import Optional
@@ -28,25 +29,52 @@ async def lifespan(app: APIRouter):
 router = APIRouter(lifespan=lifespan)
 
 
+def note_to_schema(note: Note) -> EmbeddedSentenceGet:
+    return EmbeddedSentenceGet(
+        text=note.text,
+        topic=note.topic,
+        note_id=note.note_id,
+        photos=photos_to_schema(note.photo_assets),
+    )
+
+
+def question_to_schema(question: Question) -> QuestionGet:
+    return QuestionGet(
+        text=question.question_text,
+        topic=question.topic,
+        question_id=question.question_id,
+        answer=question.question_answer,
+        photos=photos_to_schema(question.photo_assets),
+    )
+
+
 @router.post("/embed", response_model=EmbeddedSentenceGet, status_code=201)
 def embed_sentence(
     input_sentence: EmbeddedSentencePost, sess: Session = Depends(get_session)
 ) -> EmbeddedSentenceGet:
     embedding = ml_models["embedder"].encode([input_sentence.text])[0]
-    new_note = Note.insert(
-        sess, embedding=embedding, text=input_sentence.text, topic=input_sentence.topic
-    )
-    return EmbeddedSentenceGet(
-        text=new_note.text, topic=new_note.topic, note_id=new_note.note_id
-    )
+    try:
+        new_note = Note.insert(
+            sess,
+            embedding=embedding,
+            text=input_sentence.text,
+            topic=input_sentence.topic,
+            photo_asset_ids=input_sentence.photo_asset_ids,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return note_to_schema(new_note)
 
 
 @router.put("/edit", response_model=EmbeddedSentenceGet, status_code=201)
 def edit_sentence(
     edit_sentence: EmbeddedSentenceEdit, sess: Session = Depends(get_session)
 ) -> EmbeddedSentenceGet:
-    update = Note.update(sess, note_update=edit_sentence)
-    return update
+    try:
+        update = Note.update(sess, note_update=edit_sentence)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return note_to_schema(update)
 
 
 @router.post("/question", response_model=QuestionGet, status_code=201)
@@ -54,27 +82,29 @@ def create_question(
     input_question: QuestionPost, sess: Session = Depends(get_session)
 ) -> QuestionGet:
     embedding = ml_models["embedder"].encode([input_question.text])[0]
-    new_question = Question.insert(
-        sess,
-        embedding,
-        text=input_question.text,
-        answer=input_question.answer,
-        topic=input_question.topic,
-    )
-    return QuestionGet(
-        text=new_question.question_text,
-        topic=new_question.topic,
-        question_id=new_question.question_id,
-        answer=new_question.question_answer,
-    )
+    try:
+        new_question = Question.insert(
+            sess,
+            embedding,
+            text=input_question.text,
+            answer=input_question.answer,
+            topic=input_question.topic,
+            photo_asset_ids=input_question.photo_asset_ids,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return question_to_schema(new_question)
 
 
 @router.put("/question", response_model=QuestionGet, status_code=201)
 def edit_question(
     updated_question: QuestionEdit, sess: Session = Depends(get_session)
 ) -> QuestionGet:
-    update = Question.update(sess, updated_question)
-    return update
+    try:
+        update = Question.update(sess, updated_question)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return question_to_schema(update)
 
 
 @router.get("/search/note", response_model=list[EmbeddedSentenceGet], status_code=200)
@@ -92,10 +122,7 @@ def search_for_value(
         result_num=result_request,
     )
 
-    return [
-        EmbeddedSentenceGet(text=x.text, topic=x.topic, note_id=x.note_id)
-        for x in search_results
-    ]
+    return [note_to_schema(note) for note in search_results]
 
 
 @router.delete("/note", status_code=204)
@@ -123,12 +150,4 @@ def search_for_question(
     returned_questions = Question.search(
         sess, to_search=embedding, topic=topic, result_num=result_request
     )
-    return [
-        QuestionGet(
-            text=x.question_text,
-            answer=x.question_answer,
-            topic=x.topic,
-            question_id=x.question_id,
-        )
-        for x in returned_questions
-    ]
+    return [question_to_schema(question) for question in returned_questions]

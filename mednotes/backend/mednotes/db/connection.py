@@ -22,6 +22,8 @@ class Base(DeclarativeBase):
 
 def reset_tables():
     import mednotes.db.asset  # noqa: F401
+    import mednotes.db.associations  # noqa: F401
+    import mednotes.db.ml  # noqa: F401
     from mednotes.storage.assets import clear_asset_storage
 
     clear_asset_storage()

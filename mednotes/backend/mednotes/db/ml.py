@@ -1,13 +1,18 @@
 from mednotes.db import IntPK, Base
+from mednotes.db.associations import note_photo_link, question_photo_link
+from mednotes.db.photo_links import attach_photos
 from pgvector.sqlalchemy import Vector
-from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship, selectinload
 from sqlalchemy import select, Enum as SAEnum, ForeignKey, DateTime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from mednotes.db.enums import Topic
 import sqlalchemy.dialects.postgresql as pg
 from mednotes.schema.ml import QuestionEdit, EmbeddedSentenceEdit
 from sqlalchemy.ext.hybrid import hybrid_property
 import datetime
+
+if TYPE_CHECKING:
+    from mednotes.db.asset import PhotoAsset
 
 topic_enum = SAEnum(Topic, name="topic_enum", native_enum=True)
 
@@ -19,6 +24,10 @@ class Note(Base):
     embedding = mapped_column(Vector(768))
     text: Mapped[str]
     topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
+    photo_assets: Mapped[list["PhotoAsset"]] = relationship(
+        secondary=note_photo_link,
+        back_populates="notes",
+    )
 
     @classmethod
     def search(
@@ -31,18 +40,20 @@ class Note(Base):
         if topic is None:
             query = (
                 select(Note)
+                .options(selectinload(Note.photo_assets))
                 .order_by(Note.embedding.cosine_distance(to_search))
                 .limit(result_num)
             )
         else:
             query = (
                 select(Note)
+                .options(selectinload(Note.photo_assets))
                 .filter(
                     Note.embedding.cosine_distance(to_search), Note.topic.any_(topic)
                 )
                 .limit(result_num)
             )
-        return sess.execute(query).scalars()
+        return list(sess.execute(query).scalars())
 
     @classmethod
     def get_by_topic(cls, sess: Session, topic: str) -> list["Note"]:
@@ -56,10 +67,12 @@ class Note(Base):
         embedding: list[float],
         text: str,
         topic: Optional[str] = None,
+        photo_asset_ids: Optional[list[int]] = None,
     ) -> "Note":
         new_note = cls(embedding=embedding, text=text, topic=topic)
         sess.add(new_note)
         sess.flush()
+        attach_photos(sess, new_note, photo_asset_ids)
         return new_note
 
     @classmethod
@@ -82,7 +95,9 @@ class Note(Base):
         if note_update.text:
             to_edit.text = note_update.text
         if note_update.topic:
-            to_edit.text = note_update.topic
+            to_edit.topic = note_update.topic
+        if note_update.photo_asset_ids is not None:
+            attach_photos(sess, to_edit, note_update.photo_asset_ids)
         sess.add(to_edit)
         sess.flush()
         return to_edit
@@ -97,6 +112,10 @@ class Question(Base):
     question_answer: Mapped[str]
     topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
     stats: Mapped["QuestionStats"] = relationship(back_populates="question")
+    photo_assets: Mapped[list["PhotoAsset"]] = relationship(
+        secondary=question_photo_link,
+        back_populates="questions",
+    )
 
     @classmethod
     def insert(
@@ -106,12 +125,14 @@ class Question(Base):
         text: str,
         answer: str,
         topic: Optional[str] = None,
+        photo_asset_ids: Optional[list[int]] = None,
     ) -> "Question":
         new_question = cls(
             embedding=embedding, question_text=text, question_answer=answer, topic=topic
         )
         sess.add(new_question)
         sess.flush()
+        attach_photos(sess, new_question, photo_asset_ids)
         return new_question
 
     @classmethod
@@ -145,6 +166,8 @@ class Question(Base):
             to_edit.question_answer = edited_question.answer
         if edited_question.topic:
             to_edit.topic = edited_question.topic
+        if edited_question.photo_asset_ids is not None:
+            attach_photos(sess, to_edit, edited_question.photo_asset_ids)
         sess.add(to_edit)
         sess.flush()
         return to_edit
@@ -160,19 +183,21 @@ class Question(Base):
         if topic is None:
             query = (
                 select(Question)
+                .options(selectinload(Question.photo_assets))
                 .order_by(Question.embedding.cosine_distance(to_search))
                 .limit(result_num)
             )
         else:
             query = (
                 select(Question)
+                .options(selectinload(Question.photo_assets))
                 .filter(
                     Question.embedding.cosine_distance(to_search),
                     Question.topic.any_(topic),
                 )
                 .limit(result_num)
             )
-        return sess.execute(query).scalars()
+        return list(sess.execute(query).scalars())
 
 
 class QuestionStats(Base):

@@ -42,5 +42,7 @@ export const createAsset = usingPromises(assetApi.createAssetAssetCreateAssetPos
 export const createPhotoAsset = usingPromises(assetApi.createPhotoAssetAssetCreatePhotoAssetPost);
 export const createVolumeAsset = usingPromises(assetApi.createVolumeAssetAssetCreateVolumeAssetPost);
 export const listAssets = usingPromises(assetApi.listAssetsAssetListAssetsGet);
+export const searchPhotos = usingPromises(assetApi.searchPhotosAssetSearchPhotosGet);
 export const deletePhotoAsset = usingPromises(assetApi.deletePhotoAssetAssetPhotoAssetIdDelete);
+export const deleteAsset = usingPromises(assetApi.deleteAssetAssetAssetIdDelete);
 export const getPhotoAsset = usingPromises(assetApi.getPhotoAssetAssetPhotoAssetIdGet);

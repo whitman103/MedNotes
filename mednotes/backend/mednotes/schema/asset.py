@@ -1,4 +1,7 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
+
+from mednotes.db.enums import Topic
 
 
 class AssetGet(BaseModel):
@@ -14,6 +17,7 @@ class AssetGet(BaseModel):
 
 class PhotoAssetGet(AssetGet):
     format: str
+    topic: Optional[list[Topic]] = None
 
 
 class VolumeAssetGet(AssetGet):

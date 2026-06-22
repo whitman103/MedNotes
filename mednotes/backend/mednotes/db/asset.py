@@ -1,9 +1,17 @@
 from mednotes.db import Base, IntPK
-from sqlalchemy.orm import Mapped, mapped_column, Session
+from mednotes.db.associations import note_photo_link, question_photo_link
+from mednotes.db.enums import Topic
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 from sqlalchemy import ForeignKey, select
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+import sqlalchemy.dialects.postgresql as pg
 
 from mednotes.storage.assets import write_gzipped_asset, delete_gzipped_asset
+
+if TYPE_CHECKING:
+    from mednotes.db.ml import Note, Question
+
+topic_enum = pg.ENUM(Topic, name="topic_enum", create_type=False)
 
 
 class Asset(Base):
@@ -63,10 +71,24 @@ class PhotoAsset(Asset):
     asset_id: Mapped[IntPK] = mapped_column(
         ForeignKey("Asset.asset_id"),primary_key=True)
     format: Mapped[str]
+    topic: Mapped[Optional[list[Topic]]] = mapped_column(pg.ARRAY(topic_enum))
+    notes: Mapped[list["Note"]] = relationship(
+        secondary=note_photo_link,
+        back_populates="photo_assets",
+    )
+    questions: Mapped[list["Question"]] = relationship(
+        secondary=question_photo_link,
+        back_populates="photo_assets",
+    )
 
     @classmethod
     def create(
-        cls, sess: Session, data: bytes, format: str, description: str = ""
+        cls,
+        sess: Session,
+        data: bytes,
+        format: str,
+        description: str = "",
+        topic: Optional[list[Topic]] = None,
     ) -> "PhotoAsset":
         asset_path, size = write_gzipped_asset(data, "photos")
         new_asset = cls(
@@ -75,10 +97,25 @@ class PhotoAsset(Asset):
             compressed=True,
             description=description,
             format=format,
+            topic=topic,
         )
         sess.add(new_asset)
         sess.flush()
         return new_asset
+
+    @classmethod
+    def search(
+        cls,
+        sess: Session,
+        description: Optional[str] = None,
+        topic: Optional[list[Topic]] = None,
+    ) -> list["PhotoAsset"]:
+        query = select(PhotoAsset)
+        if description:
+            query = query.where(PhotoAsset.description.ilike(f"%{description}%"))
+        if topic:
+            query = query.where(PhotoAsset.topic.overlap(topic))
+        return list(sess.execute(query).scalars())
 
     __mapper_args__ = {"polymorphic_identity": "PhotoAsset"}
 

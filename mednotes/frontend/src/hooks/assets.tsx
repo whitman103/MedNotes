@@ -1,14 +1,13 @@
 "use client"
 
-import { assetApi } from "@/client";
-import { usingPromises } from "@/utils/toPromise";
+import { createPhotoAsset, searchPhotos } from "@/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { PhotoAssetGet } from "@/generated_client";
+import type { PhotoAssetGet, Topic } from "@/generated_client";
+import { assetApi } from "@/client";
+import { usingPromises } from "@/utils/toPromise";
 
-const createPhotoAsset = usingPromises(assetApi.createPhotoAssetAssetCreatePhotoAssetPost);
 const deletePhotoAsset = usingPromises(assetApi.deletePhotoAssetAssetPhotoAssetIdDelete);
-const listAssets = usingPromises(assetApi.listAssetsAssetListAssetsGet);
 
 export function useCreatePhotoAsset() {
     const queryClient = useQueryClient();
@@ -18,14 +17,16 @@ export function useCreatePhotoAsset() {
             file,
             format,
             description,
+            topics,
         }: {
             file: File;
             format: string;
             description: string;
-        }) => createPhotoAsset(description, file, format),
+            topics: Topic[];
+        }) => createPhotoAsset(description, file, format, JSON.stringify(topics)),
         onSuccess: () => {
             toast.success("Photo uploaded successfully!");
-            queryClient.invalidateQueries({ queryKey: ["ASSETS"] });
+            queryClient.invalidateQueries({ queryKey: ["PHOTOS"] });
         },
         onError: () => toast.error("Something went wrong with photo upload!"),
     });
@@ -38,15 +39,16 @@ export function useDeletePhotoAsset() {
         mutationFn: (photo: PhotoAssetGet) => deletePhotoAsset(photo.asset_id),
         onSuccess: () => {
             toast.success("Photo deleted successfully!");
-            queryClient.invalidateQueries({ queryKey: ["ASSETS"] });
+            queryClient.invalidateQueries({ queryKey: ["PHOTOS"] });
         },
         onError: () => toast.error("Something went wrong deleting the photo!"),
     });
 }
 
-export function useFetchAssets() {
+export function useSearchPhotos(description: string, topics: Topic[], enabled = true) {
     return useQuery({
-        queryKey: ["ASSETS"],
-        queryFn: () => listAssets(),
+        queryKey: ["PHOTOS", description, topics],
+        enabled,
+        queryFn: () => searchPhotos(description, topics.length > 0 ? topics : undefined),
     });
 }

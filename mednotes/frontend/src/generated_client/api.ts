@@ -80,6 +80,12 @@ export interface EmbeddedSentenceEdit {
     'id': number;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof EmbeddedSentenceEdit
+     */
+    'photo_asset_ids'?: Array<number> | null;
+    /**
+     * 
      * @type {string}
      * @memberof EmbeddedSentenceEdit
      */
@@ -105,6 +111,12 @@ export interface EmbeddedSentenceGet {
     'note_id': number;
     /**
      * 
+     * @type {Array<PhotoAssetGet>}
+     * @memberof EmbeddedSentenceGet
+     */
+    'photos'?: Array<PhotoAssetGet>;
+    /**
+     * 
      * @type {string}
      * @memberof EmbeddedSentenceGet
      */
@@ -122,6 +134,12 @@ export interface EmbeddedSentenceGet {
  * @interface EmbeddedSentencePost
  */
 export interface EmbeddedSentencePost {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof EmbeddedSentencePost
+     */
+    'photo_asset_ids'?: Array<number> | null;
     /**
      * 
      * @type {string}
@@ -199,6 +217,12 @@ export interface PhotoAssetGet {
     'size': number;
     /**
      * 
+     * @type {Array<Topic>}
+     * @memberof PhotoAssetGet
+     */
+    'topic'?: Array<Topic> | null;
+    /**
+     * 
      * @type {string}
      * @memberof PhotoAssetGet
      */
@@ -224,6 +248,12 @@ export interface QuestionEdit {
     'id': number;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof QuestionEdit
+     */
+    'photo_asset_ids'?: Array<number> | null;
+    /**
+     * 
      * @type {string}
      * @memberof QuestionEdit
      */
@@ -247,6 +277,12 @@ export interface QuestionGet {
      * @memberof QuestionGet
      */
     'answer': string;
+    /**
+     * 
+     * @type {Array<PhotoAssetGet>}
+     * @memberof QuestionGet
+     */
+    'photos'?: Array<PhotoAssetGet>;
     /**
      * 
      * @type {number}
@@ -278,6 +314,12 @@ export interface QuestionPost {
      * @memberof QuestionPost
      */
     'answer': string;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof QuestionPost
+     */
+    'photo_asset_ids'?: Array<number> | null;
     /**
      * 
      * @type {string}
@@ -471,16 +513,19 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} description 
          * @param {File} file 
          * @param {string} format 
+         * @param {string} topic 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPhotoAssetAssetCreatePhotoAssetPost: async (description: string, file: File, format: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createPhotoAssetAssetCreatePhotoAssetPost: async (description: string, file: File, format: string, topic: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'description' is not null or undefined
             assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'description', description)
             // verify required parameter 'file' is not null or undefined
             assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'file', file)
             // verify required parameter 'format' is not null or undefined
             assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'format', format)
+            // verify required parameter 'topic' is not null or undefined
+            assertParamExists('createPhotoAssetAssetCreatePhotoAssetPost', 'topic', topic)
             const localVarPath = `/asset/create-photo-asset`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -505,6 +550,10 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
     
             if (format !== undefined) { 
                 localVarFormParams.append('format', format as any);
+            }
+    
+            if (topic !== undefined) { 
+                localVarFormParams.append('topic', topic as any);
             }
     
     
@@ -562,6 +611,40 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAssetAssetAssetIdDelete: async (assetId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'assetId' is not null or undefined
+            assertParamExists('deleteAssetAssetAssetIdDelete', 'assetId', assetId)
+            const localVarPath = `/asset/{asset_id}`
+                .replace(`{${"asset_id"}}`, encodeURIComponent(String(assetId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -666,6 +749,46 @@ export const AssetApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Search Photos
+         * @param {string} [description] 
+         * @param {Array<string> | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchPhotosAssetSearchPhotosGet: async (description?: string, topic?: Array<string> | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/asset/search/photos`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (description !== undefined) {
+                localVarQueryParameter['description'] = description;
+            }
+
+            if (topic) {
+                localVarQueryParameter['topic'] = topic;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -694,11 +817,12 @@ export const AssetApiFp = function(configuration?: Configuration) {
          * @param {string} description 
          * @param {File} file 
          * @param {string} format 
+         * @param {string} topic 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PhotoAssetGet>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options);
+        async createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, topic: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PhotoAssetGet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, topic, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -711,6 +835,17 @@ export const AssetApiFp = function(configuration?: Configuration) {
          */
         async createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VolumeAssetGet>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createVolumeAssetAssetCreateVolumeAssetPost(description, file, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteAssetAssetAssetIdDelete(assetId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAssetAssetAssetIdDelete(assetId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -745,6 +880,18 @@ export const AssetApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listAssetsAssetListAssetsGet(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary Search Photos
+         * @param {string} [description] 
+         * @param {Array<string> | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchPhotosAssetSearchPhotosGet(description?: string, topic?: Array<string> | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PhotoAssetGet>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchPhotosAssetSearchPhotosGet(description, topic, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -772,11 +919,12 @@ export const AssetApiFactory = function (configuration?: Configuration, basePath
          * @param {string} description 
          * @param {File} file 
          * @param {string} format 
+         * @param {string} topic 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: any): AxiosPromise<PhotoAssetGet> {
-            return localVarFp.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options).then((request) => request(axios, basePath));
+        createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, topic: string, options?: any): AxiosPromise<PhotoAssetGet> {
+            return localVarFp.createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, topic, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -788,6 +936,16 @@ export const AssetApiFactory = function (configuration?: Configuration, basePath
          */
         createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: any): AxiosPromise<VolumeAssetGet> {
             return localVarFp.createVolumeAssetAssetCreateVolumeAssetPost(description, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Asset
+         * @param {number} assetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAssetAssetAssetIdDelete(assetId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteAssetAssetAssetIdDelete(assetId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -818,6 +976,17 @@ export const AssetApiFactory = function (configuration?: Configuration, basePath
         listAssetsAssetListAssetsGet(options?: any): AxiosPromise<Array<AssetGet>> {
             return localVarFp.listAssetsAssetListAssetsGet(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary Search Photos
+         * @param {string} [description] 
+         * @param {Array<string> | null} [topic] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchPhotosAssetSearchPhotosGet(description?: string, topic?: Array<string> | null, options?: any): AxiosPromise<Array<PhotoAssetGet>> {
+            return localVarFp.searchPhotosAssetSearchPhotosGet(description, topic, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -847,12 +1016,13 @@ export class AssetApi extends BaseAPI {
      * @param {string} description 
      * @param {File} file 
      * @param {string} format 
+     * @param {string} topic 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssetApi
      */
-    public createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, options?: AxiosRequestConfig) {
-        return AssetApiFp(this.configuration).createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, options).then((request) => request(this.axios, this.basePath));
+    public createPhotoAssetAssetCreatePhotoAssetPost(description: string, file: File, format: string, topic: string, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).createPhotoAssetAssetCreatePhotoAssetPost(description, file, format, topic, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -866,6 +1036,18 @@ export class AssetApi extends BaseAPI {
      */
     public createVolumeAssetAssetCreateVolumeAssetPost(description: string, file: File, options?: AxiosRequestConfig) {
         return AssetApiFp(this.configuration).createVolumeAssetAssetCreateVolumeAssetPost(description, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Asset
+     * @param {number} assetId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public deleteAssetAssetAssetIdDelete(assetId: number, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).deleteAssetAssetAssetIdDelete(assetId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -901,6 +1083,19 @@ export class AssetApi extends BaseAPI {
      */
     public listAssetsAssetListAssetsGet(options?: AxiosRequestConfig) {
         return AssetApiFp(this.configuration).listAssetsAssetListAssetsGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Search Photos
+     * @param {string} [description] 
+     * @param {Array<string> | null} [topic] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AssetApi
+     */
+    public searchPhotosAssetSearchPhotosGet(description?: string, topic?: Array<string> | null, options?: AxiosRequestConfig) {
+        return AssetApiFp(this.configuration).searchPhotosAssetSearchPhotosGet(description, topic, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

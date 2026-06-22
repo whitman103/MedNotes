@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+import json
+from typing import Optional
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from mednotes.db.connection import get_session
 from mednotes.db.asset import Asset, PhotoAsset, VolumeAsset
+from mednotes.db.enums import Topic
 from mednotes.schema.asset import AssetGet, PhotoAssetGet, VolumeAssetGet
 from mednotes.storage.assets import read_gzipped_asset
 
@@ -17,9 +21,30 @@ PHOTO_MEDIA_TYPES = {
 }
 
 
+def parse_topics(topic: str) -> list[Topic]:
+    if not topic:
+        return []
+    values = json.loads(topic)
+    return [Topic(value) for value in values]
+
+
 @router.get("/list-assets", response_model=list[AssetGet], status_code=200)
 def list_assets(sess: Session = Depends(get_session)) -> list[Asset]:
     return Asset.list(sess)
+
+
+@router.get("/search/photos", response_model=list[PhotoAssetGet], status_code=200)
+def search_photos(
+    description: str = "",
+    topic: Optional[list[str]] = Query(None),
+    sess: Session = Depends(get_session),
+) -> list[PhotoAsset]:
+    topics = [Topic(value) for value in topic] if topic else None
+    return PhotoAsset.search(
+        sess,
+        description=description or None,
+        topic=topics,
+    )
 
 
 @router.get("/photo/{asset_id}")
@@ -68,10 +93,20 @@ async def create_photo_asset(
     file: UploadFile = File(...),
     format: str = Form(...),
     description: str = Form(""),
+    topic: str = Form("[]"),
     sess: Session = Depends(get_session),
 ) -> PhotoAsset:
     data = await file.read()
-    return PhotoAsset.create(sess, data, format=format, description=description)
+    try:
+        return PhotoAsset.create(
+            sess,
+            data,
+            format=format,
+            description=description,
+            topic=parse_topics(topic) or None,
+        )
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail="Invalid topic values") from exc
 
 
 @router.post("/create-volume-asset", response_model=VolumeAssetGet, status_code=201)
